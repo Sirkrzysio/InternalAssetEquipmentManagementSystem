@@ -1,0 +1,81 @@
+﻿using AssetManagement.Domain.Entities;
+using AssetManagement.Domain.Enums;
+using AssetManagement.Infrastructure.Data;
+using AssetManagement.Application.Interfaces.Repositories;
+using Microsoft.EntityFrameworkCore;
+
+namespace AssetManagement.Infrastructure.Repositories.Implementations;
+
+public class AuditLogRepository : IAuditLogRepository
+{
+    private readonly ApplicationDbContext _context;
+
+    public AuditLogRepository(ApplicationDbContext context)
+    {
+        _context = context;
+    }
+
+    public async Task<AuditLog?> GetByIdAsync(Guid id)
+    {
+        return await _context.AuditLogs.FindAsync(id);
+    }
+
+    public async Task<IEnumerable<AuditLog>> GetAllAsync()
+    {
+        return await _context.AuditLogs
+            .OrderByDescending(a => a.Timestamp)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<AuditLog>> GetByEntityAsync(string entityName, Guid entityId)
+    {
+        return await _context.AuditLogs
+            .Where(a => a.EntityName == entityName && a.EntityId == entityId)
+            .OrderByDescending(a => a.Timestamp)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<AuditLog>> GetByUserAsync(Guid userId)
+    {
+        return await _context.AuditLogs
+            .Where(a => a.UserId == userId)
+            .OrderByDescending(a => a.Timestamp)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<AuditLog>> GetByActionAsync(AuditAction action)
+    {
+        return await _context.AuditLogs
+            .Where(a => a.Action == action)
+            .OrderByDescending(a => a.Timestamp)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<AuditLog>> GetByDateRangeAsync(DateTime from, DateTime to)
+    {
+        return await _context.AuditLogs
+            .Where(a => a.Timestamp >= from && a.Timestamp <= to)
+            .OrderByDescending(a => a.Timestamp)
+            .ToListAsync();
+    }
+
+    public async Task<(IEnumerable<AuditLog> Items, int TotalCount)> GetPagedAsync(int page, int pageSize)
+    {
+        var query = _context.AuditLogs.AsQueryable();
+
+        var totalCount = await query.CountAsync();
+        var items = await query
+            .OrderByDescending(a => a.Timestamp)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (items, totalCount);
+    }
+
+    public async Task<AuditLog> AddAsync(AuditLog auditLog)
+    {
+        await _context.AuditLogs.AddAsync(auditLog);
+        return auditLog;
+    }
+}

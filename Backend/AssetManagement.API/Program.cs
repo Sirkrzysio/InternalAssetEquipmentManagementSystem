@@ -1,41 +1,61 @@
+using AssetManagement.API.Extensions;
+using AssetManagement.API.Middleware;
+using AssetManagement.Application;
+using AssetManagement.Infrastructure;
+using AssetManagement.Infrastructure.Data;
+using AssetManagement.Infrastructure.Data.Seed;
+using AssetManagement.Application.Interfaces.Security;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+// ===== Add layers =====
+builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddApplication();
+builder.Services.AddApiServices(builder.Configuration);
 
+// ===== Authorization only (JWT configured in Infrastructure) =====
+builder.Services.AddAuthorization();
+
+
+// ===== Build app =====
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// ===== Swagger =====
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
-}
-
-app.UseHttpsRedirection();
-
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
     {
-        var forecast = Enumerable.Range(1, 5).Select(index =>
-                new WeatherForecast
-                (
-                    DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                    Random.Shared.Next(-20, 55),
-                    summaries[Random.Shared.Next(summaries.Length)]
-                ))
-            .ToArray();
-        return forecast;
-    })
-    .WithName("GetWeatherForecast");
-
-app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Asset Management API v1");
+        c.RoutePrefix = string.Empty; // dostęp pod root (opcjonalnie)
+    });
 }
+
+// ===== Middleware =====
+app.UseExceptionHandling();
+app.UseHttpsRedirection();
+app.UseCors("AllowAll");
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllers();
+
+// ===== Database Migration & Seeding =====
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    var passwordHasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
+
+    // ❌ NIE MIGRUJ AUTOMATYCZNIE
+    // await dbContext.Database.MigrateAsync();
+
+    // ✔️ Seed tylko gdy baza już istnieje
+    await DataSeeder.SeedAsync(dbContext, passwordHasher);
+}
+
+
+// ===== Run =====
+app.Run();
