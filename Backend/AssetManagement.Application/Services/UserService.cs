@@ -1,4 +1,4 @@
-﻿using AssetManagement.Application.DTOs.Common;
+﻿﻿using AssetManagement.Application.DTOs.Common;
 using AssetManagement.Application.DTOs.Users;
 using AssetManagement.Application.Interfaces;
 using AssetManagement.Application.Interfaces.Repositories;
@@ -58,7 +58,7 @@ public class UserService : IUserService
         return Result<UserDto>.Success(_mapper.Map<UserDto>(user));
     }
 
-    public async Task<Result<UserDto>> UpdateAsync(Guid id, CreateUserDto dto)
+    public async Task<Result<UserDto>> UpdateAsync(Guid id, UpdateUserDto dto)
     {
         var user = await _unitOfWork.Users.GetByIdAsync(id);
         if (user == null)
@@ -67,18 +67,7 @@ public class UserService : IUserService
         if (await _unitOfWork.Users.EmailExistsAsync(dto.Email, id))
             return Result<UserDto>.Failure("Użytkownik z tym adresem email już istnieje");
 
-        user.Email = dto.Email;
-        user.FirstName = dto.FirstName;
-        user.LastName = dto.LastName;
-        user.Department = dto.Department;
-        user.PhoneNumber = dto.PhoneNumber;
-        user.Role = dto.Role;
-
-        if (!string.IsNullOrEmpty(dto.Password))
-        {
-            user.PasswordHash = _passwordHasher.HashPassword(dto.Password);
-        }
-
+        _mapper.Map(dto, user);
         await _unitOfWork.Users.UpdateAsync(user);
         await _unitOfWork.SaveChangesAsync();
 
@@ -120,5 +109,18 @@ public class UserService : IUserService
         await _unitOfWork.SaveChangesAsync();
 
         return Result.Success();
+    }
+
+    public async Task<Result<UserDto>> RestoreAsync(Guid id)
+    {
+        var user = await _unitOfWork.Users.GetDeletedByIdAsync(id);
+        if (user == null)
+            return Result<UserDto>.Failure("Usunięty użytkownik nie został znaleziony");
+
+        user.DeletedAt = null;
+        await _unitOfWork.Users.UpdateAsync(user);
+        await _unitOfWork.SaveChangesAsync();
+
+        return Result<UserDto>.Success(_mapper.Map<UserDto>(user));
     }
 }

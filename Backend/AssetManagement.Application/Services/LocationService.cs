@@ -1,4 +1,4 @@
-﻿using AssetManagement.Application.DTOs.Common;
+﻿﻿using AssetManagement.Application.DTOs.Common;
 using AssetManagement.Application.DTOs.Locations;
 using AssetManagement.Application.Interfaces;
 using AssetManagement.Application.Interfaces.Repositories;
@@ -51,7 +51,7 @@ public class LocationService : ILocationService
         return Result<LocationDto>.Success(_mapper.Map<LocationDto>(location));
     }
 
-    public async Task<Result<LocationDto>> UpdateAsync(Guid id, CreateLocationDto dto)
+    public async Task<Result<LocationDto>> UpdateAsync(Guid id, UpdateLocationDto dto)
     {
         var location = await _unitOfWork.Locations.GetByIdAsync(id);
         if (location == null)
@@ -76,5 +76,18 @@ public class LocationService : ILocationService
         await _unitOfWork.SaveChangesAsync();
 
         return Result.Success();
+    }
+
+    public async Task<Result<LocationDto>> RestoreAsync(Guid id)
+    {
+        var location = await _unitOfWork.Locations.GetDeletedByIdAsync(id);
+        if (location == null)
+            return Result<LocationDto>.Failure("Usunięta lokalizacja nie została znaleziona");
+
+        location.DeletedAt = null;
+        await _unitOfWork.Locations.UpdateAsync(location);
+        await _unitOfWork.SaveChangesAsync();
+
+        return Result<LocationDto>.Success(_mapper.Map<LocationDto>(location));
     }
 }

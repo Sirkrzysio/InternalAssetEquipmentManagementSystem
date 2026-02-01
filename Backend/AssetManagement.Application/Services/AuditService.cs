@@ -1,4 +1,4 @@
-﻿using AssetManagement.Application.DTOs.Common;
+﻿﻿using AssetManagement.Application.DTOs.Common;
 using AssetManagement.Application.Interfaces;
 using AssetManagement.Application.Interfaces.Repositories;
 using AssetManagement.Domain.Entities;
@@ -53,5 +53,17 @@ public class AuditService : IAuditService
     {
         var (items, totalCount) = await _unitOfWork.AuditLogs.GetPagedAsync(page, pageSize);
         return Result<PagedResult<AuditLog>>.Success(PagedResult<AuditLog>.Create(items, totalCount, page, pageSize));
+    }
+
+    public async Task<Result<PagedResult<AuditLog>>> GetPagedAsync(int page, int pageSize, string? searchTerm)
+    {
+        var (items, totalCount) = await _unitOfWork.AuditLogs.GetPagedAsync(page, pageSize, searchTerm);
+        return Result<PagedResult<AuditLog>>.Success(PagedResult<AuditLog>.Create(items, totalCount, page, pageSize));
+    }
+
+    public async Task<Result<IEnumerable<AuditLog>>> GetByUserAsync(Guid userId)
+    {
+        var logs = await _unitOfWork.AuditLogs.GetByUserAsync(userId);
+        return Result<IEnumerable<AuditLog>>.Success(logs);
     }
 }

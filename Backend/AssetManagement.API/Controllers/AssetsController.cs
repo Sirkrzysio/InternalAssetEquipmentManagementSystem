@@ -48,6 +48,36 @@ public class AssetsController : ControllerBase
         return Ok(result.Data);
     }
 
+    [HttpGet("category/{categoryId:guid}")]
+    public async Task<IActionResult> GetByCategory(Guid categoryId)
+    {
+        var result = await _assetService.GetByCategoryAsync(categoryId);
+        if (!result.IsSuccess)
+            return BadRequest(result.Error);
+
+        return Ok(result.Data);
+    }
+
+    [HttpGet("status/{status}")]
+    public async Task<IActionResult> GetByStatus(string status)
+    {
+        var result = await _assetService.GetByStatusAsync(status);
+        if (!result.IsSuccess)
+            return BadRequest(result.Error);
+
+        return Ok(result.Data);
+    }
+
+    [HttpGet("location/{locationId:guid}")]
+    public async Task<IActionResult> GetByLocation(Guid locationId)
+    {
+        var result = await _assetService.GetByLocationAsync(locationId);
+        if (!result.IsSuccess)
+            return BadRequest(result.Error);
+
+        return Ok(result.Data);
+    }
+
     [HttpPost]
     [Authorize(Roles = "Admin,Manager")]
     public async Task<IActionResult> Create([FromBody] CreateAssetDto dto)
@@ -79,5 +109,16 @@ public class AssetsController : ControllerBase
             return BadRequest(result.Error);
 
         return NoContent();
+    }
+
+    [HttpPost("{id:guid}/restore")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Restore(Guid id)
+    {
+        var result = await _assetService.RestoreAsync(id);
+        if (!result.IsSuccess)
+            return BadRequest(result.Error);
+
+        return Ok(result.Data);
     }
 }

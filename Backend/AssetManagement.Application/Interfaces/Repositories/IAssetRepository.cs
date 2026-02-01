@@ -1,4 +1,4 @@
-﻿using AssetManagement.Domain.Entities;
+﻿﻿using AssetManagement.Domain.Entities;
 using AssetManagement.Domain.Enums;
 
 namespace AssetManagement.Application.Interfaces.Repositories;
@@ -8,8 +8,10 @@ public interface IAssetRepository
     Task<Asset?> GetByIdAsync(Guid id);
     Task<Asset?> GetByIdWithDetailsAsync(Guid id);
     Task<Asset?> GetBySerialNumberAsync(string serialNumber);
+    Task<Asset?> GetDeletedByIdAsync(Guid id);
     Task<IEnumerable<Asset>> GetAllAsync();
     Task<IEnumerable<Asset>> GetByStatusAsync(AssetStatus status);
+    Task<IEnumerable<Asset>> GetByStatusAsync(string status);
     Task<IEnumerable<Asset>> GetByCategoryAsync(Guid categoryId);
     Task<IEnumerable<Asset>> GetByLocationAsync(Guid locationId);
     Task<(IEnumerable<Asset> Items, int TotalCount)> GetPagedAsync(int page, int pageSize, string? searchTerm = null);

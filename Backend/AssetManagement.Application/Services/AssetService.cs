@@ -1,4 +1,4 @@
-﻿using AssetManagement.Application.DTOs.Assets;
+﻿﻿using AssetManagement.Application.DTOs.Assets;
 using AssetManagement.Application.DTOs.Common;
 using AssetManagement.Application.Interfaces;
 using AssetManagement.Application.Interfaces.Repositories;
@@ -96,5 +96,37 @@ public class AssetService : IAssetService
         await _unitOfWork.SaveChangesAsync();
 
         return Result.Success();
+    }
+
+    public async Task<Result<IEnumerable<AssetDto>>> GetByCategoryAsync(Guid categoryId)
+    {
+        var assets = await _unitOfWork.Assets.GetByCategoryAsync(categoryId);
+        return Result<IEnumerable<AssetDto>>.Success(_mapper.Map<IEnumerable<AssetDto>>(assets));
+    }
+
+    public async Task<Result<IEnumerable<AssetDto>>> GetByStatusAsync(string status)
+    {
+        var assets = await _unitOfWork.Assets.GetByStatusAsync(status);
+        return Result<IEnumerable<AssetDto>>.Success(_mapper.Map<IEnumerable<AssetDto>>(assets));
+    }
+
+    public async Task<Result<IEnumerable<AssetDto>>> GetByLocationAsync(Guid locationId)
+    {
+        var assets = await _unitOfWork.Assets.GetByLocationAsync(locationId);
+        return Result<IEnumerable<AssetDto>>.Success(_mapper.Map<IEnumerable<AssetDto>>(assets));
+    }
+
+    public async Task<Result<AssetDto>> RestoreAsync(Guid id)
+    {
+        var asset = await _unitOfWork.Assets.GetDeletedByIdAsync(id);
+        if (asset == null)
+            return Result<AssetDto>.Failure("Usunięty asset nie został znaleziony");
+
+        asset.DeletedAt = null;
+        await _unitOfWork.Assets.UpdateAsync(asset);
+        await _unitOfWork.SaveChangesAsync();
+
+        var result = await _unitOfWork.Assets.GetByIdWithDetailsAsync(id);
+        return Result<AssetDto>.Success(_mapper.Map<AssetDto>(result));
     }
 }

@@ -28,6 +28,14 @@ public class LocationRepository : ILocationRepository
             .FirstOrDefaultAsync(l => l.Id == id);
     }
 
+    public async Task<Location?> GetDeletedByIdAsync(Guid id)
+    {
+        return await _context.Locations
+            .IgnoreQueryFilters()
+            .Include(l => l.Assets)
+            .FirstOrDefaultAsync(l => l.Id == id && l.DeletedAt != null);
+    }
+
     public async Task<IEnumerable<Location>> GetAllAsync()
     {
         return await _context.Locations.ToListAsync();

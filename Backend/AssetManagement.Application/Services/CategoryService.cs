@@ -1,4 +1,4 @@
-﻿using AssetManagement.Application.DTOs.Categories;
+﻿﻿using AssetManagement.Application.DTOs.Categories;
 using AssetManagement.Application.DTOs.Common;
 using AssetManagement.Application.Interfaces;
 using AssetManagement.Application.Interfaces.Repositories;
@@ -54,7 +54,7 @@ public class CategoryService : ICategoryService
         return Result<CategoryDto>.Success(_mapper.Map<CategoryDto>(category));
     }
 
-    public async Task<Result<CategoryDto>> UpdateAsync(Guid id, CreateCategoryDto dto)
+    public async Task<Result<CategoryDto>> UpdateAsync(Guid id, UpdateCategoryDto dto)
     {
         var category = await _unitOfWork.Categories.GetByIdAsync(id);
         if (category == null)
@@ -82,5 +82,18 @@ public class CategoryService : ICategoryService
         await _unitOfWork.SaveChangesAsync();
 
         return Result.Success();
+    }
+
+    public async Task<Result<CategoryDto>> RestoreAsync(Guid id)
+    {
+        var category = await _unitOfWork.Categories.GetDeletedByIdAsync(id);
+        if (category == null)
+            return Result<CategoryDto>.Failure("Usunięta kategoria nie została znaleziona");
+
+        category.DeletedAt = null;
+        await _unitOfWork.Categories.UpdateAsync(category);
+        await _unitOfWork.SaveChangesAsync();
+
+        return Result<CategoryDto>.Success(_mapper.Map<CategoryDto>(category));
     }
 }

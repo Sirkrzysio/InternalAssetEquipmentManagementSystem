@@ -37,6 +37,15 @@ public class AssetRepository : IAssetRepository
             .FirstOrDefaultAsync(a => a.SerialNumber == serialNumber);
     }
 
+    public async Task<Asset?> GetDeletedByIdAsync(Guid id)
+    {
+        return await _context.Assets
+            .IgnoreQueryFilters()
+            .Include(a => a.Category)
+            .Include(a => a.Location)
+            .FirstOrDefaultAsync(a => a.Id == id && a.DeletedAt != null);
+    }
+
     public async Task<IEnumerable<Asset>> GetAllAsync()
     {
         return await _context.Assets
@@ -51,6 +60,15 @@ public class AssetRepository : IAssetRepository
             .Where(a => a.Status == status)
             .Include(a => a.Category)
             .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Asset>> GetByStatusAsync(string status)
+    {
+        if (Enum.TryParse<AssetStatus>(status, true, out var assetStatus))
+        {
+            return await GetByStatusAsync(assetStatus);
+        }
+        return Enumerable.Empty<Asset>();
     }
 
     public async Task<IEnumerable<Asset>> GetByCategoryAsync(Guid categoryId)

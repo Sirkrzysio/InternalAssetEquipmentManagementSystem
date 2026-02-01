@@ -53,6 +53,19 @@ public class AssignmentService : IAssignmentService
         return Result<PagedResult<AssignmentDto>>.Success(PagedResult<AssignmentDto>.Create(dtos, totalCount, page, pageSize));
     }
 
+    public async Task<Result<PagedResult<AssignmentDto>>> GetPagedAsync(int page, int pageSize, string? searchTerm)
+    {
+        var (items, totalCount) = await _unitOfWork.Assignments.GetPagedAsync(page, pageSize, searchTerm);
+        var dtos = _mapper.Map<IEnumerable<AssignmentDto>>(items);
+        return Result<PagedResult<AssignmentDto>>.Success(PagedResult<AssignmentDto>.Create(dtos, totalCount, page, pageSize));
+    }
+
+    public async Task<Result<IEnumerable<AssignmentDto>>> GetActiveAssignmentsAsync()
+    {
+        var assignments = await _unitOfWork.Assignments.GetActiveAsync();
+        return Result<IEnumerable<AssignmentDto>>.Success(_mapper.Map<IEnumerable<AssignmentDto>>(assignments));
+    }
+
     public async Task<Result<AssignmentDto>> CreateAsync(CreateAssignmentDto dto)
     {
         var asset = await _unitOfWork.Assets.GetByIdAsync(dto.AssetId);
@@ -109,7 +122,7 @@ public class AssignmentService : IAssignmentService
     {
         var assignment = await _unitOfWork.Assignments.GetByIdAsync(id);
         if (assignment == null)
-            return Result.Failure("Przypisanie nie zostało znalezione");
+            return Result.Failure("Przypisanie nie zostało znaleione");
 
         if (assignment.ReturnedAt == null)
             return Result.Failure("Nie można usunąć aktywnego przypisania");
@@ -118,5 +131,32 @@ public class AssignmentService : IAssignmentService
         await _unitOfWork.SaveChangesAsync();
 
         return Result.Success();
+    }
+
+    public async Task<Result<IEnumerable<AssignmentDto>>> BulkReturnAsync(List<Guid> assignmentIds)
+    {
+        var assignments = new List<AssignmentDto>();
+        
+        foreach (var assignmentId in assignmentIds)
+        {
+            var assignment = await _unitOfWork.Assignments.GetByIdAsync(assignmentId);
+            if (assignment == null || assignment.ReturnedAt != null)
+                continue;
+
+            var asset = await _unitOfWork.Assets.GetByIdAsync(assignment.AssetId);
+            if (asset == null)
+                continue;
+
+            assignment.ReturnedAt = DateTime.UtcNow;
+            asset.Status = AssetStatus.Available;
+
+            await _unitOfWork.Assignments.UpdateAsync(assignment);
+            await _unitOfWork.Assets.UpdateAsync(asset);
+            
+            assignments.Add(_mapper.Map<AssignmentDto>(assignment));
+        }
+
+        await _unitOfWork.SaveChangesAsync();
+        return Result<IEnumerable<AssignmentDto>>.Success(assignments);
     }
 }

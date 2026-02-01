@@ -57,20 +57,4 @@ public class AuthController : ControllerBase
 
         return Ok(result.Data);
     }
-    
-    [HttpGet("test-db")]
-    public async Task<IActionResult> TestDatabaseConnection()
-    {
-        try
-        {
-            var result = await _authService.GetCurrentUserAsync(Guid.Empty);
-            return Ok(new { message = "Połączenie z bazą OK", connected = true });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { message = "Błąd połączenia", error = ex.Message });
-        }
-    }
-
-    
 }

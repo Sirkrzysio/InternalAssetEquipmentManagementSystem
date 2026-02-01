@@ -1,4 +1,4 @@
-﻿using AssetManagement.Application.Interfaces;
+﻿﻿using AssetManagement.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,9 +17,9 @@ public class AuditLogsController : ControllerBase
     }
 
     [HttpGet("paged")]
-    public async Task<IActionResult> GetPaged([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+    public async Task<IActionResult> GetPaged([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string? searchTerm = null)
     {
-        var result = await _auditService.GetPagedAsync(page, pageSize);
+        var result = await _auditService.GetPagedAsync(page, pageSize, searchTerm);
         if (!result.IsSuccess)
             return BadRequest(result.Error);
 
@@ -30,6 +30,16 @@ public class AuditLogsController : ControllerBase
     public async Task<IActionResult> GetByEntity(string entityName, Guid entityId)
     {
         var result = await _auditService.GetByEntityAsync(entityName, entityId);
+        if (!result.IsSuccess)
+            return BadRequest(result.Error);
+
+        return Ok(result.Data);
+    }
+
+    [HttpGet("user/{userId:guid}")]
+    public async Task<IActionResult> GetByUser(Guid userId)
+    {
+        var result = await _auditService.GetByUserAsync(userId);
         if (!result.IsSuccess)
             return BadRequest(result.Error);
 

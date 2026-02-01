@@ -34,6 +34,14 @@ public class CategoryRepository : ICategoryRepository
             .FirstOrDefaultAsync(c => c.Name.ToLower() == name.ToLower());
     }
 
+    public async Task<Category?> GetDeletedByIdAsync(Guid id)
+    {
+        return await _context.Categories
+            .IgnoreQueryFilters()
+            .Include(c => c.Assets)
+            .FirstOrDefaultAsync(c => c.Id == id && c.DeletedAt != null);
+    }
+
     public async Task<IEnumerable<Category>> GetAllAsync()
     {
         return await _context.Categories.ToListAsync();

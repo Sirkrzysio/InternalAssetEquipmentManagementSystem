@@ -32,7 +32,7 @@ public class AuditLoggingMiddleware
                 _ => AuditAction.Update
             };
 
-            // Logowanie podstawowe - szczegółowe logowanie powinno być w serwisach
+            // Logowanie podstawowe
             if (!string.IsNullOrEmpty(userId) && context.Response.StatusCode < 400)
             {
                 var path = context.Request.Path.Value ?? "";

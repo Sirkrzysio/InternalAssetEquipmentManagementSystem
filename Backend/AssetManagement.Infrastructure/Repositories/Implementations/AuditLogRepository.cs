@@ -3,6 +3,7 @@ using AssetManagement.Domain.Enums;
 using AssetManagement.Infrastructure.Data;
 using AssetManagement.Application.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace AssetManagement.Infrastructure.Repositories.Implementations;
 
@@ -61,7 +62,40 @@ public class AuditLogRepository : IAuditLogRepository
 
     public async Task<(IEnumerable<AuditLog> Items, int TotalCount)> GetPagedAsync(int page, int pageSize)
     {
+        // Walidacja parametrów
+        if (page < 1) page = 1;
+        if (pageSize < 1) pageSize = 10;
+        if (pageSize > 100) pageSize = 100; // Limit dla performance
+
         var query = _context.AuditLogs.AsQueryable();
+
+        var totalCount = await query.CountAsync();
+        var items = await query
+            .OrderByDescending(a => a.Timestamp)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (items, totalCount);
+    }
+
+    public async Task<(IEnumerable<AuditLog> Items, int TotalCount)> GetPagedAsync(int page, int pageSize, string? searchTerm)
+    {
+        // Walidacja parametrów
+        if (page < 1) page = 1;
+        if (pageSize < 1) pageSize = 10;
+        if (pageSize > 100) pageSize = 100; // Limit dla performance
+
+        var query = _context.AuditLogs.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            query = query.Where(a => 
+                EF.Functions.ILike(a.EntityName, $"%{searchTerm}%") ||
+                EF.Functions.ILike(a.Action.ToString(), $"%{searchTerm}%") ||
+                (a.UserName != null && EF.Functions.ILike(a.UserName, $"%{searchTerm}%")) ||
+                (a.IpAddress != null && EF.Functions.ILike(a.IpAddress, $"%{searchTerm}%")));
+        }
 
         var totalCount = await query.CountAsync();
         var items = await query

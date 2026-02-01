@@ -1,4 +1,4 @@
-﻿using System.Linq;
+﻿﻿using System.Linq;
 using AssetManagement.Domain.Entities;
 using AssetManagement.Infrastructure.Data;
 using AssetManagement.Application.Interfaces.Repositories;
@@ -65,6 +65,11 @@ public class AssignmentRepository : IAssignmentRepository
             .ToListAsync();
     }
 
+    public async Task<IEnumerable<Assignment>> GetActiveAsync()
+    {
+        return await GetActiveAssignmentsAsync();
+    }
+
     public async Task<Assignment?> GetActiveAssignmentForAssetAsync(Guid assetId)
     {
         return await _context.Assignments
@@ -79,6 +84,33 @@ public class AssignmentRepository : IAssignmentRepository
             .Include(a => a.Asset)
             .Include(a => a.User)
             .AsQueryable();
+
+        var totalCount = await query.CountAsync();
+        var items = await query
+            .OrderByDescending(a => a.AssignedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (items, totalCount);
+    }
+
+    public async Task<(IEnumerable<Assignment> Items, int TotalCount)> GetPagedAsync(int page, int pageSize, string? searchTerm)
+    {
+        var query = _context.Assignments
+            .Include(a => a.Asset)
+            .Include(a => a.User)
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            query = query.Where(a => 
+                a.Asset.Name.Contains(searchTerm) ||
+                a.Asset.SerialNumber.Contains(searchTerm) ||
+                a.User.FirstName.Contains(searchTerm) ||
+                a.User.LastName.Contains(searchTerm) ||
+                a.User.Email.Contains(searchTerm));
+        }
 
         var totalCount = await query.CountAsync();
         var items = await query

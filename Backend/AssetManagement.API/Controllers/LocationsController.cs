@@ -1,4 +1,4 @@
-﻿using AssetManagement.Application.DTOs.Locations;
+﻿﻿using AssetManagement.Application.DTOs.Locations;
 using AssetManagement.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -60,7 +60,7 @@ public class LocationsController : ControllerBase
 
     [HttpPut("{id:guid}")]
     [Authorize(Roles = "Admin,Manager")]
-    public async Task<IActionResult> Update(Guid id, [FromBody] CreateLocationDto dto)
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateLocationDto dto)
     {
         var result = await _locationService.UpdateAsync(id, dto);
         if (!result.IsSuccess)
@@ -78,5 +78,16 @@ public class LocationsController : ControllerBase
             return BadRequest(result.Error);
 
         return NoContent();
+    }
+
+    [HttpPost("{id:guid}/restore")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Restore(Guid id)
+    {
+        var result = await _locationService.RestoreAsync(id);
+        if (!result.IsSuccess)
+            return BadRequest(result.Error);
+
+        return Ok(result.Data);
     }
 }

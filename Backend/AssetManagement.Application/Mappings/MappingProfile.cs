@@ -1,4 +1,4 @@
-﻿using AssetManagement.Application.DTOs.Assets;
+﻿﻿using AssetManagement.Application.DTOs.Assets;
 using AssetManagement.Application.DTOs.Assignments;
 using AssetManagement.Application.DTOs.Categories;
 using AssetManagement.Application.DTOs.Locations;
@@ -33,15 +33,19 @@ public class MappingProfile : Profile
             .ForMember(d => d.FullName, o => o.MapFrom(s => s.FullName));
         CreateMap<CreateUserDto, User>()
             .ForMember(d => d.PasswordHash, o => o.Ignore());
+        CreateMap<UpdateUserDto, User>()
+            .ForMember(d => d.PasswordHash, o => o.Ignore());
 
         // Location mappings
         CreateMap<Location, LocationDto>()
             .ForMember(d => d.AssetCount, o => o.MapFrom(s => s.Assets.Count));
         CreateMap<CreateLocationDto, Location>();
+        CreateMap<UpdateLocationDto, Location>();
 
         // Category mappings
         CreateMap<Category, CategoryDto>()
             .ForMember(d => d.AssetCount, o => o.MapFrom(s => s.Assets.Count));
         CreateMap<CreateCategoryDto, Category>();
+        CreateMap<UpdateCategoryDto, Category>();
     }
 }

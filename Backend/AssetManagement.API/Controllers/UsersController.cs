@@ -1,4 +1,4 @@
-﻿using AssetManagement.Application.DTOs.Users;
+﻿﻿using AssetManagement.Application.DTOs.Users;
 using AssetManagement.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -60,7 +60,7 @@ public class UsersController : ControllerBase
 
     [HttpPut("{id:guid}")]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> Update(Guid id, [FromBody] CreateUserDto dto)
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateUserDto dto)
     {
         var result = await _userService.UpdateAsync(id, dto);
         if (!result.IsSuccess)
@@ -100,5 +100,16 @@ public class UsersController : ControllerBase
             return BadRequest(result.Error);
 
         return Ok();
+    }
+
+    [HttpPost("{id:guid}/restore")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Restore(Guid id)
+    {
+        var result = await _userService.RestoreAsync(id);
+        if (!result.IsSuccess)
+            return BadRequest(result.Error);
+
+        return Ok(result.Data);
     }
 }

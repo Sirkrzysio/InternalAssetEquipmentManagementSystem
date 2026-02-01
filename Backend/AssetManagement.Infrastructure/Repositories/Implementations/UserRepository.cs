@@ -1,4 +1,4 @@
-﻿using AssetManagement.Domain.Entities;
+﻿﻿using AssetManagement.Domain.Entities;
 using AssetManagement.Domain.Enums;
 using AssetManagement.Infrastructure.Data;
 using AssetManagement.Application.Interfaces.Repositories;
@@ -24,6 +24,13 @@ public class UserRepository : IUserRepository
     {
         return await _context.Users
             .FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+    }
+
+    public async Task<User?> GetDeletedByIdAsync(Guid id)
+    {
+        return await _context.Users
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(u => u.Id == id && u.DeletedAt != null);
     }
 
     public async Task<IEnumerable<User>> GetAllAsync()

@@ -1,4 +1,4 @@
-﻿using AssetManagement.Application.DTOs.Assignments;
+﻿﻿using AssetManagement.Application.DTOs.Assignments;
 using AssetManagement.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -28,9 +28,9 @@ public class AssignmentsController : ControllerBase
     }
 
     [HttpGet("paged")]
-    public async Task<IActionResult> GetPaged([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+    public async Task<IActionResult> GetPaged([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string? searchTerm = null)
     {
-        var result = await _assignmentService.GetPagedAsync(page, pageSize);
+        var result = await _assignmentService.GetPagedAsync(page, pageSize, searchTerm);
         if (!result.IsSuccess)
             return BadRequest(result.Error);
 
@@ -98,5 +98,26 @@ public class AssignmentsController : ControllerBase
             return BadRequest(result.Error);
 
         return NoContent();
+    }
+
+    [HttpPost("bulk-return")]
+    [Authorize(Roles = "Admin,Manager")]
+    public async Task<IActionResult> BulkReturn([FromBody] List<Guid> assignmentIds)
+    {
+        var result = await _assignmentService.BulkReturnAsync(assignmentIds);
+        if (!result.IsSuccess)
+            return BadRequest(result.Error);
+
+        return Ok(result.Data);
+    }
+
+    [HttpGet("active")]
+    public async Task<IActionResult> GetActiveAssignments()
+    {
+        var result = await _assignmentService.GetActiveAssignmentsAsync();
+        if (!result.IsSuccess)
+            return BadRequest(result.Error);
+
+        return Ok(result.Data);
     }
 }
