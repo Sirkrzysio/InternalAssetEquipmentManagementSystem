@@ -1,4 +1,4 @@
-﻿using AssetManagement.Application.Interfaces;
+﻿﻿using AssetManagement.Application.Interfaces;
 using AssetManagement.Application.Mappings;
 using AssetManagement.Application.Services;
 using FluentValidation;
@@ -25,6 +25,7 @@ public static class DependencyInjection
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IAuditService, AuditService>();
+        services.AddScoped<IDataCleanupService, DataCleanupService>();
 
         return services;
     }

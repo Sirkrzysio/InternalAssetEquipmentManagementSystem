@@ -83,10 +83,13 @@ public class CategoryRepository : ICategoryRepository
 
     public async Task DeleteAsync(Guid id)
     {
-        var category = await GetByIdAsync(id);
+        var category = await _context.Categories
+            .FirstOrDefaultAsync(c => c.Id == id && c.DeletedAt == null);
+        
         if (category != null)
         {
-            _context.Categories.Remove(category);
+            category.DeletedAt = DateTime.UtcNow;
+            _context.Categories.Update(category);
         }
     }
 
@@ -97,7 +100,7 @@ public class CategoryRepository : ICategoryRepository
 
     public async Task<bool> HasAssetsAsync(Guid id)
     {
-        return await _context.Assets.AnyAsync(a => a.CategoryId == id);
+        return await _context.Assets.AnyAsync(a => a.CategoryId == id && a.DeletedAt == null);
     }
 
     public async Task<bool> NameExistsAsync(string name, Guid? excludeId = null)
@@ -110,5 +113,30 @@ public class CategoryRepository : ICategoryRepository
         }
 
         return await query.AnyAsync();
+    }
+
+    public async Task<int> CleanupOldDeletedAsync(DateTime cutoffDate)
+    {
+        return await _context.Categories
+            .IgnoreQueryFilters()
+            .Where(c => c.DeletedAt != null && c.DeletedAt < cutoffDate)
+            .ExecuteDeleteAsync();
+    }
+
+    public async Task<int> CleanupAllDeletedAsync()
+    {
+        return await _context.Categories
+            .IgnoreQueryFilters()
+            .Where(c => c.DeletedAt != null)
+            .ExecuteDeleteAsync();
+    }
+
+    public async Task<IEnumerable<Category>> GetAllDeletedAsync()
+    {
+        return await _context.Categories
+            .IgnoreQueryFilters()
+            .Where(c => c.DeletedAt != null)
+            .OrderByDescending(c => c.DeletedAt)
+            .ToListAsync();
     }
 }

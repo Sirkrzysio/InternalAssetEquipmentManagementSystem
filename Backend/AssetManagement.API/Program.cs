@@ -1,6 +1,8 @@
 using AssetManagement.API.Extensions;
 using AssetManagement.API.Middleware;
+using AssetManagement.API.BackgroundServices;
 using AssetManagement.Application;
+using AssetManagement.Application.Configuration;
 using AssetManagement.Infrastructure;
 using AssetManagement.Infrastructure.Data;
 using AssetManagement.Infrastructure.Data.Seed;
@@ -14,6 +16,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 builder.Services.AddApiServices(builder.Configuration);
+
+// ===== Configuration =====
+builder.Services.Configure<DataRetentionOptions>(
+    builder.Configuration.GetSection(DataRetentionOptions.SectionName));
+
+// ===== Background Services =====
+builder.Services.AddHostedService<DataCleanupBackgroundService>();
 
 // ===== Authorization only (JWT configured in Infrastructure) =====
 builder.Services.AddAuthorization();

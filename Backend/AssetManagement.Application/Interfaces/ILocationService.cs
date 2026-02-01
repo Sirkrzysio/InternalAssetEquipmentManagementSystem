@@ -1,4 +1,4 @@
-﻿﻿using AssetManagement.Application.DTOs.Common;
+﻿﻿﻿using AssetManagement.Application.DTOs.Common;
 using AssetManagement.Application.DTOs.Locations;
 
 namespace AssetManagement.Application.Interfaces;

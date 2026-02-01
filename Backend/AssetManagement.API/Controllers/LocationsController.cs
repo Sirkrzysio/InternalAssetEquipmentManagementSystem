@@ -1,4 +1,4 @@
-﻿﻿using AssetManagement.Application.DTOs.Locations;
+﻿using AssetManagement.Application.DTOs.Locations;
 using AssetManagement.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

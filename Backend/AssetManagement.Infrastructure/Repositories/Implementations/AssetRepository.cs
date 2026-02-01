@@ -126,10 +126,13 @@ public class AssetRepository : IAssetRepository
 
     public async Task DeleteAsync(Guid id)
     {
-        var asset = await GetByIdAsync(id);
+        var asset = await _context.Assets
+            .FirstOrDefaultAsync(a => a.Id == id && a.DeletedAt == null);
+            
         if (asset != null)
         {
-            _context.Assets.Remove(asset);
+            asset.DeletedAt = DateTime.UtcNow;
+            _context.Assets.Update(asset);
         }
     }
 
@@ -148,5 +151,32 @@ public class AssetRepository : IAssetRepository
         }
 
         return await query.AnyAsync();
+    }
+
+    public async Task<int> CleanupOldDeletedAsync(DateTime cutoffDate)
+    {
+        return await _context.Assets
+            .IgnoreQueryFilters()
+            .Where(a => a.DeletedAt != null && a.DeletedAt < cutoffDate)
+            .ExecuteDeleteAsync();
+    }
+
+    public async Task<int> CleanupAllDeletedAsync()
+    {
+        return await _context.Assets
+            .IgnoreQueryFilters()
+            .Where(a => a.DeletedAt != null)
+            .ExecuteDeleteAsync();
+    }
+
+    public async Task<IEnumerable<Asset>> GetAllDeletedAsync()
+    {
+        return await _context.Assets
+            .IgnoreQueryFilters()
+            .Where(a => a.DeletedAt != null)
+            .Include(a => a.Category)
+            .Include(a => a.Location)
+            .OrderByDescending(a => a.DeletedAt)
+            .ToListAsync();
     }
 }

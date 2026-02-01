@@ -1,4 +1,4 @@
-﻿﻿using AssetManagement.Domain.Entities;
+﻿using AssetManagement.Domain.Entities;
 using AssetManagement.Domain.Enums;
 using AssetManagement.Infrastructure.Data;
 using AssetManagement.Application.Interfaces.Repositories;
@@ -89,10 +89,13 @@ public class UserRepository : IUserRepository
 
     public async Task DeleteAsync(Guid id)
     {
-        var user = await GetByIdAsync(id);
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => u.Id == id && u.DeletedAt == null);
+            
         if (user != null)
         {
-            _context.Users.Remove(user);
+            user.DeletedAt = DateTime.UtcNow;
+            _context.Users.Update(user);
         }
     }
 
@@ -111,5 +114,30 @@ public class UserRepository : IUserRepository
         }
 
         return await query.AnyAsync();
+    }
+
+    public async Task<int> CleanupOldDeletedAsync(DateTime cutoffDate)
+    {
+        return await _context.Users
+            .IgnoreQueryFilters()
+            .Where(u => u.DeletedAt != null && u.DeletedAt < cutoffDate)
+            .ExecuteDeleteAsync();
+    }
+
+    public async Task<int> CleanupAllDeletedAsync()
+    {
+        return await _context.Users
+            .IgnoreQueryFilters()
+            .Where(u => u.DeletedAt != null)
+            .ExecuteDeleteAsync();
+    }
+
+    public async Task<IEnumerable<User>> GetAllDeletedAsync()
+    {
+        return await _context.Users
+            .IgnoreQueryFilters()
+            .Where(u => u.DeletedAt != null)
+            .OrderByDescending(u => u.DeletedAt)
+            .ToListAsync();
     }
 }

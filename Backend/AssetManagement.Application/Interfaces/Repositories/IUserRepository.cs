@@ -1,4 +1,4 @@
-﻿﻿using AssetManagement.Domain.Entities;
+﻿using AssetManagement.Domain.Entities;
 using AssetManagement.Domain.Enums;
 
 namespace AssetManagement.Application.Interfaces.Repositories;
@@ -9,6 +9,7 @@ public interface IUserRepository
     Task<User?> GetByEmailAsync(string email);
     Task<User?> GetDeletedByIdAsync(Guid id);
     Task<IEnumerable<User>> GetAllAsync();
+    Task<IEnumerable<User>> GetAllDeletedAsync();
     Task<IEnumerable<User>> GetByRoleAsync(UserRole role);
     Task<IEnumerable<User>> GetActiveUsersAsync();
     Task<(IEnumerable<User> Items, int TotalCount)> GetPagedAsync(int page, int pageSize, string? searchTerm = null);
@@ -17,4 +18,6 @@ public interface IUserRepository
     Task DeleteAsync(Guid id);
     Task<bool> ExistsAsync(Guid id);
     Task<bool> EmailExistsAsync(string email, Guid? excludeId = null);
+    Task<int> CleanupOldDeletedAsync(DateTime cutoffDate);
+    Task<int> CleanupAllDeletedAsync();
 }

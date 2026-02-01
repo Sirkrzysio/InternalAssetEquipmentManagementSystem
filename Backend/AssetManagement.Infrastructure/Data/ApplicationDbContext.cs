@@ -1,4 +1,4 @@
-﻿using AssetManagement.Domain.Entities;
+﻿﻿using AssetManagement.Domain.Entities;
 using AssetManagement.Domain.Entities.Common;
 using Microsoft.EntityFrameworkCore;
 
@@ -35,8 +35,16 @@ public class ApplicationDbContext : DbContext
             e.Property(x => x.LastName).HasMaxLength(50);
             e.Property(x => x.Role).HasConversion<string>().HasMaxLength(20);
             
-            e.HasIndex(x => x.Username).IsUnique();
-            e.HasIndex(x => x.Email).IsUnique();
+            // Unique constraints tylko dla aktywnych użytkowników
+            e.HasIndex(x => x.Username)
+                .IsUnique()
+                .HasFilter("\"DeletedAt\" IS NULL");
+            e.HasIndex(x => x.Email)
+                .IsUnique()
+                .HasFilter("\"DeletedAt\" IS NULL");
+            
+            // soft delete
+            e.HasQueryFilter(x => x.DeletedAt == null);
         });
 
         // ===== equipment (Asset w kodzie, equipment w bazie) =====
@@ -53,7 +61,10 @@ public class ApplicationDbContext : DbContext
             e.Property(x => x.Model).HasMaxLength(100);
             e.Property(x => x.CategoryId).HasColumnName("category_id");
 
-            e.HasIndex(x => x.SerialNumber).IsUnique();
+            // Unique constraint tylko dla aktywnych assets
+            e.HasIndex(x => x.SerialNumber)
+                .IsUnique()
+                .HasFilter("\"DeletedAt\" IS NULL");
             e.HasIndex(x => x.Status).HasDatabaseName("idx_equipment_status");
 
             e.HasOne(x => x.Category)
@@ -78,6 +89,9 @@ public class ApplicationDbContext : DbContext
 
             e.Property(x => x.Name).HasMaxLength(100).IsRequired();
             e.Property(x => x.Description).HasMaxLength(255);
+            
+            // soft delete
+            e.HasQueryFilter(x => x.DeletedAt == null);
         });
 
         // ===== categories =====
@@ -89,7 +103,13 @@ public class ApplicationDbContext : DbContext
             e.Property(x => x.Name).HasMaxLength(50).IsRequired();
             e.Property(x => x.Description).HasMaxLength(255);
             
-            e.HasIndex(x => x.Name).IsUnique();
+            // Unique constraint tylko dla aktywnych rekordów
+            e.HasIndex(x => x.Name)
+                .IsUnique()
+                .HasFilter("\"DeletedAt\" IS NULL");
+            
+            // soft delete
+            e.HasQueryFilter(x => x.DeletedAt == null);
         });
 
         // ===== assignments =====
@@ -119,8 +139,8 @@ public class ApplicationDbContext : DbContext
                 .HasForeignKey(x => x.LocationId)
                 .OnDelete(DeleteBehavior.SetNull);
                 
-            // Query filter - filtruj usunięte Assets
-            e.HasQueryFilter(x => x.Asset == null || x.Asset.DeletedAt == null);
+            // soft delete
+            e.HasQueryFilter(x => x.DeletedAt == null);
         });
 
         // ===== audit_logs =====

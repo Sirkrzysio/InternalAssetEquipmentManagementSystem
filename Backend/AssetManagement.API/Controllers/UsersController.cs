@@ -1,4 +1,4 @@
-﻿﻿using AssetManagement.Application.DTOs.Users;
+﻿using AssetManagement.Application.DTOs.Users;
 using AssetManagement.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

@@ -77,10 +77,13 @@ public class LocationRepository : ILocationRepository
 
     public async Task DeleteAsync(Guid id)
     {
-        var location = await GetByIdAsync(id);
+        var location = await _context.Locations
+            .FirstOrDefaultAsync(l => l.Id == id && l.DeletedAt == null);
+            
         if (location != null)
         {
-            _context.Locations.Remove(location);
+            location.DeletedAt = DateTime.UtcNow;
+            _context.Locations.Update(location);
         }
     }
 
@@ -91,6 +94,31 @@ public class LocationRepository : ILocationRepository
 
     public async Task<bool> HasAssetsAsync(Guid id)
     {
-        return await _context.Assets.AnyAsync(a => a.LocationId == id);
+        return await _context.Assets.AnyAsync(a => a.LocationId == id && a.DeletedAt == null);
+    }
+
+    public async Task<int> CleanupOldDeletedAsync(DateTime cutoffDate)
+    {
+        return await _context.Locations
+            .IgnoreQueryFilters()
+            .Where(l => l.DeletedAt != null && l.DeletedAt < cutoffDate)
+            .ExecuteDeleteAsync();
+    }
+
+    public async Task<int> CleanupAllDeletedAsync()
+    {
+        return await _context.Locations
+            .IgnoreQueryFilters()
+            .Where(l => l.DeletedAt != null)
+            .ExecuteDeleteAsync();
+    }
+
+    public async Task<IEnumerable<Location>> GetAllDeletedAsync()
+    {
+        return await _context.Locations
+            .IgnoreQueryFilters()
+            .Where(l => l.DeletedAt != null)
+            .OrderByDescending(l => l.DeletedAt)
+            .ToListAsync();
     }
 }

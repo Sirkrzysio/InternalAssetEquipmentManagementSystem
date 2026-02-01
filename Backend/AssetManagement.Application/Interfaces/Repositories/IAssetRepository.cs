@@ -1,4 +1,4 @@
-﻿﻿using AssetManagement.Domain.Entities;
+﻿using AssetManagement.Domain.Entities;
 using AssetManagement.Domain.Enums;
 
 namespace AssetManagement.Application.Interfaces.Repositories;
@@ -10,6 +10,7 @@ public interface IAssetRepository
     Task<Asset?> GetBySerialNumberAsync(string serialNumber);
     Task<Asset?> GetDeletedByIdAsync(Guid id);
     Task<IEnumerable<Asset>> GetAllAsync();
+    Task<IEnumerable<Asset>> GetAllDeletedAsync();
     Task<IEnumerable<Asset>> GetByStatusAsync(AssetStatus status);
     Task<IEnumerable<Asset>> GetByStatusAsync(string status);
     Task<IEnumerable<Asset>> GetByCategoryAsync(Guid categoryId);
@@ -20,4 +21,6 @@ public interface IAssetRepository
     Task DeleteAsync(Guid id);
     Task<bool> ExistsAsync(Guid id);
     Task<bool> SerialNumberExistsAsync(string serialNumber, Guid? excludeId = null);
+    Task<int> CleanupOldDeletedAsync(DateTime cutoffDate);
+    Task<int> CleanupAllDeletedAsync();
 }

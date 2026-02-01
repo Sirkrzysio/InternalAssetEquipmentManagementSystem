@@ -1,5 +1,6 @@
-﻿using AssetManagement.Infrastructure.Data;
+﻿﻿using AssetManagement.Infrastructure.Data;
 using AssetManagement.Application.Interfaces.Repositories;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace AssetManagement.Infrastructure.Repositories.Implementations;

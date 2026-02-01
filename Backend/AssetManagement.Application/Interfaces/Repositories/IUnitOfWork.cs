@@ -1,4 +1,4 @@
-﻿namespace AssetManagement.Application.Interfaces.Repositories;
+﻿﻿namespace AssetManagement.Application.Interfaces.Repositories;
 
 public interface IUnitOfWork : IDisposable
 {
