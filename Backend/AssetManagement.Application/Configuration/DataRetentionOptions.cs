@@ -1,4 +1,4 @@
-﻿namespace AssetManagement.Application.Configuration;
+﻿﻿namespace AssetManagement.Application.Configuration;
 
 public class DataRetentionOptions
 {
@@ -8,6 +8,7 @@ public class DataRetentionOptions
     public int LocationsRetentionHours { get; set; } = 24; 
     public int UsersRetentionDays { get; set; } = 30;
     public int AssetsRetentionDays { get; set; } = 90;
+    public int AuditLogsRetentionHours { get; set; } = 1; 
     public bool NotificationEnabled { get; set; } = true;
     public int NotificationHoursBeforeDeletion { get; set; } = 1;
 }

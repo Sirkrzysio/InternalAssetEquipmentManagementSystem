@@ -112,4 +112,16 @@ public class AuditLogRepository : IAuditLogRepository
         await _context.AuditLogs.AddAsync(auditLog);
         return auditLog;
     }
+
+    public async Task<int> CleanupOldDeletedAsync(DateTime cutoffDate)
+    {
+        return await _context.AuditLogs
+            .Where(a => a.Timestamp < cutoffDate)
+            .ExecuteDeleteAsync();
+    }
+
+    public async Task<int> CleanupAllDeletedAsync()
+    {
+        return await _context.AuditLogs.ExecuteDeleteAsync();
+    }
 }

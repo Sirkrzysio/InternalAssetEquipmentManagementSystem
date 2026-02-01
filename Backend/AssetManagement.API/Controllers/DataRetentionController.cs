@@ -51,7 +51,8 @@ public class DataRetentionController : ControllerBase
                     categories = result.CategoriesDeleted,
                     locations = result.LocationsDeleted,
                     users = result.UsersDeleted,
-                    assets = result.AssetsDeleted
+                    assets = result.AssetsDeleted,
+                    auditLogs = result.AuditLogsDeleted
                 },
                 warnings = result.Warnings
             });

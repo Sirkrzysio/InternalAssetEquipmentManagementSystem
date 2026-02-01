@@ -1,4 +1,4 @@
-﻿﻿using AssetManagement.Domain.Entities;
+﻿using AssetManagement.Domain.Entities;
 using AssetManagement.Domain.Enums;
 
 namespace AssetManagement.Application.Interfaces.Repositories;
@@ -14,4 +14,6 @@ public interface IAuditLogRepository
     Task<(IEnumerable<AuditLog> Items, int TotalCount)> GetPagedAsync(int page, int pageSize);
     Task<(IEnumerable<AuditLog> Items, int TotalCount)> GetPagedAsync(int page, int pageSize, string? searchTerm);
     Task<AuditLog> AddAsync(AuditLog auditLog);
+    Task<int> CleanupOldDeletedAsync(DateTime cutoffDate);
+    Task<int> CleanupAllDeletedAsync();
 }

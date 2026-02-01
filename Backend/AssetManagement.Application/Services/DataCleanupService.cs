@@ -43,6 +43,7 @@ public class DataCleanupService : IDataCleanupService
                 result.LocationsDeleted = await _unitOfWork.Locations.CleanupAllDeletedAsync();
                 result.UsersDeleted = await _unitOfWork.Users.CleanupAllDeletedAsync();
                 result.AssetsDeleted = await _unitOfWork.Assets.CleanupAllDeletedAsync();
+                result.AuditLogsDeleted = await _unitOfWork.AuditLogs.CleanupAllDeletedAsync();
             }
             else
             {
@@ -61,14 +62,18 @@ public class DataCleanupService : IDataCleanupService
                 // 4. Assets cleanup
                 var assetCutoff = DateTime.UtcNow.AddDays(-_options.AssetsRetentionDays);
                 result.AssetsDeleted = await _unitOfWork.Assets.CleanupOldDeletedAsync(assetCutoff);
+
+                // 5. Audit logs cleanup (1 hour retention)
+                var auditLogCutoff = DateTime.UtcNow.AddHours(-_options.AuditLogsRetentionHours);
+                result.AuditLogsDeleted = await _unitOfWork.AuditLogs.CleanupOldDeletedAsync(auditLogCutoff);
             }
 
             // ExecuteDeleteAsync() operations are executed directly in database
             // No need to call SaveChangesAsync() as changes are already committed
 
             _logger.LogInformation(
-                "Cleanup completed: {Categories} categories, {Locations} locations, {Users} users, {Assets} assets permanently deleted",
-                result.CategoriesDeleted, result.LocationsDeleted, result.UsersDeleted, result.AssetsDeleted);
+                "Cleanup completed: {Categories} categories, {Locations} locations, {Users} users, {Assets} assets, {AuditLogs} audit logs permanently deleted",
+                result.CategoriesDeleted, result.LocationsDeleted, result.UsersDeleted, result.AssetsDeleted, result.AuditLogsDeleted);
 
             // 6. Check for warnings
             if (_options.NotificationEnabled)
@@ -109,6 +114,20 @@ public class DataCleanupService : IDataCleanupService
         var assetCutoff = now.AddDays(-_options.AssetsRetentionDays);
         var pendingAssets = await GetPendingAssetsAsync(now, assetCutoff);
         status.Assets = pendingAssets;
+
+        // Get pending audit logs (1 hour retention)
+        var auditLogCutoff = now.AddHours(-_options.AuditLogsRetentionHours);
+        var pendingAuditLogs = await GetPendingAuditLogsAsync(now, auditLogCutoff);
+        status.AuditLogs = pendingAuditLogs;
+
+        status.Policies = new RetentionPolicies
+        {
+            Categories = $"{_options.CategoriesRetentionHours} hours",
+            Locations = $"{_options.LocationsRetentionHours} hours",
+            Users = $"{_options.UsersRetentionDays} days",
+            Assets = $"{_options.AssetsRetentionDays} days",
+            AuditLogs = $"{_options.AuditLogsRetentionHours} hour"
+        };
 
         return status;
     }
@@ -178,6 +197,23 @@ public class DataCleanupService : IDataCleanupService
                 DeletedAt = a.DeletedAt!.Value,
                 HoursUntilPermanentDelete = Math.Max(0, (_options.AssetsRetentionDays * 24) - (int)(now - a.DeletedAt!.Value).TotalHours),
                 IsUrgent = (now - a.DeletedAt!.Value).TotalDays >= (_options.AssetsRetentionDays - 7)
+            })
+            .ToList();
+    }
+
+    private async Task<List<PendingAuditLogDeletionItem>> GetPendingAuditLogsAsync(DateTime now, DateTime cutoff)
+    {
+        var auditLogs = await _unitOfWork.AuditLogs.GetByDateRangeAsync(cutoff, now);
+        
+        return auditLogs
+            .Select(a => new PendingAuditLogDeletionItem
+            {
+                Id = a.Id,
+                EntityName = a.EntityName,
+                Action = a.Action.ToString(),
+                Timestamp = a.Timestamp,
+                HoursUntilPermanentDelete = Math.Max(0, _options.AuditLogsRetentionHours - (int)(now - a.Timestamp).TotalHours),
+                IsUrgent = (now - a.Timestamp).TotalHours >= (_options.AuditLogsRetentionHours - 0.1) // 6 minut przed usunięciem
             })
             .ToList();
     }

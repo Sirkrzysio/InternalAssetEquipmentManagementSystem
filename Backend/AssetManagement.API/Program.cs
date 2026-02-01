@@ -38,7 +38,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Asset Management API v1");
-        c.RoutePrefix = string.Empty; // dostęp pod root (opcjonalnie)
+        c.RoutePrefix = string.Empty; // dostęp pod root 
     });
 }
 
@@ -49,6 +49,7 @@ app.UseCors("AllowAll");
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseAuditLogging();
 
 app.MapControllers();
 
@@ -58,10 +59,7 @@ using (var scope = app.Services.CreateScope())
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     var passwordHasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
 
-    // ❌ NIE MIGRUJ AUTOMATYCZNIE
-    // await dbContext.Database.MigrateAsync();
-
-    // ✔️ Seed tylko gdy baza już istnieje
+    // Apply migrations
     await DataSeeder.SeedAsync(dbContext, passwordHasher);
 }
 
