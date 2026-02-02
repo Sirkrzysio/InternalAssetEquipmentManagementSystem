@@ -12,26 +12,25 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ===== Add layers =====
+// Add layers
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 builder.Services.AddApiServices(builder.Configuration);
 
-// ===== Configuration =====
+// Configuration
 builder.Services.Configure<DataRetentionOptions>(
     builder.Configuration.GetSection(DataRetentionOptions.SectionName));
 
-// ===== Background Services =====
+// Background Services
 builder.Services.AddHostedService<DataCleanupBackgroundService>();
 
-// ===== Authorization only (JWT configured in Infrastructure) =====
+// Authorization (JWT configured in Infrastructure)
 builder.Services.AddAuthorization();
 
-
-// ===== Build app =====
+// Build app
 var app = builder.Build();
 
-// ===== Swagger =====
+// Swagger
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -42,7 +41,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-// ===== Middleware =====
+// Middleware
 app.UseExceptionHandling();
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
@@ -53,7 +52,7 @@ app.UseAuditLogging();
 
 app.MapControllers();
 
-// ===== Database Migration & Seeding =====
+// Database Migration & Seeding
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
@@ -63,6 +62,4 @@ using (var scope = app.Services.CreateScope())
     await DataSeeder.SeedAsync(dbContext, passwordHasher);
 }
 
-
-// ===== Run =====
 app.Run();

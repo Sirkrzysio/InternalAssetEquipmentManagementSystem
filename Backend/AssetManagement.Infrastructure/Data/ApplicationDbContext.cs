@@ -1,4 +1,4 @@
-﻿﻿using AssetManagement.Domain.Entities;
+﻿using AssetManagement.Domain.Entities;
 using AssetManagement.Domain.Entities.Common;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,9 +10,9 @@ public class ApplicationDbContext : DbContext
     {
     }
 
-    // Zmieniam nazwy tabel żeby pasowały do Twojej bazy danych
+    
     public DbSet<User> Users => Set<User>();
-    public DbSet<Asset> Assets => Set<Asset>(); // Assets w kodzie, equipment w bazie
+    public DbSet<Asset> Assets => Set<Asset>(); 
     public DbSet<Location> Locations => Set<Location>();
     public DbSet<Assignment> Assignments => Set<Assignment>();
     public DbSet<Category> Categories => Set<Category>();
@@ -22,7 +22,7 @@ public class ApplicationDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
         
-        // ===== users =====
+        // Users configuration
         modelBuilder.Entity<User>(e =>
         {
             e.ToTable("users");
@@ -47,7 +47,7 @@ public class ApplicationDbContext : DbContext
             e.HasQueryFilter(x => x.DeletedAt == null);
         });
 
-        // ===== equipment (Asset w kodzie, equipment w bazie) =====
+        // Assets configuration (equipment table)
         modelBuilder.Entity<Asset>(e =>
         {
             e.ToTable("equipment");
@@ -81,7 +81,7 @@ public class ApplicationDbContext : DbContext
             e.HasQueryFilter(x => x.DeletedAt == null);
         });
 
-        // ===== locations =====
+        // Locations configuration
         modelBuilder.Entity<Location>(e =>
         {
             e.ToTable("locations");
@@ -94,7 +94,7 @@ public class ApplicationDbContext : DbContext
             e.HasQueryFilter(x => x.DeletedAt == null);
         });
 
-        // ===== categories =====
+        // Categories configuration
         modelBuilder.Entity<Category>(e =>
         {
             e.ToTable("categories");
@@ -112,7 +112,7 @@ public class ApplicationDbContext : DbContext
             e.HasQueryFilter(x => x.DeletedAt == null);
         });
 
-        // ===== assignments =====
+        // Assignments configuration
         modelBuilder.Entity<Assignment>(e =>
         {
             e.ToTable("assignments");
@@ -143,7 +143,7 @@ public class ApplicationDbContext : DbContext
             e.HasQueryFilter(x => x.DeletedAt == null);
         });
 
-        // ===== audit_logs =====
+        // Audit logs configuration
         modelBuilder.Entity<AuditLog>(e =>
         {
             e.ToTable("audit_logs");
