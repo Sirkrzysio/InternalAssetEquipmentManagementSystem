@@ -1,0 +1,158 @@
+﻿<div class="assignments-container">
+  <header class="page-header">
+    <h1>Przypisania Sprzętu</h1>
+    <button
+      *ngIf="canManage"
+      routerLink="/assignments/create"
+      class="btn btn-primary"
+    >
+      + Nowe Przypisanie
+    </button>
+  </header>
+
+  <div class="filters-section">
+    <div class="search-box">
+      <input
+        type="text"
+        placeholder="Szukaj przypisań..."
+        [formControl]="searchControl"
+        class="search-input"
+      >
+    </div>
+
+    <div class="filter-buttons">
+      <button
+        *ngFor="let filter of statusFilters"
+        (click)="filterByStatus(filter.value)"
+        [class.active]="selectedStatusFilter === filter.value"
+        class="filter-btn"
+      >
+        {{ filter.label }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div [hidden]="!isLoading">
+    <app-loading-spinner message="Ładowanie przypisań..."></app-loading-spinner>
+  </div>
+
+  <!-- Content -->
+  <div class="content-area" [hidden]="isLoading">
+    <div class="assignments-grid" *ngIf="assignments.length > 0; else noAssignments">
+      <div class="assignment-card" *ngFor="let assignment of assignments">
+        <div class="assignment-header">
+          <div class="assignment-title">
+            <h3>{{ assignment.assetName }}</h3>
+            <span class="serial">S/N: {{ assignment.assetSerialNumber }}</span>
+          </div>
+          <span
+            class="type-badge"
+            [ngClass]="'type-' + assignment.type"
+          >
+            {{ assignment.type | assignmentType }}
+          </span>
+        </div>
+
+        <div class="assignment-details">
+          <div class="detail-item">
+            <strong>Przypisane do:</strong>
+            <span>{{ assignment.userFullName }}</span>
+          </div>
+          <div class="detail-item">
+            <strong>Email:</strong>
+            <span>{{ assignment.userEmail }}</span>
+          </div>
+          <div class="detail-item">
+            <strong>Data przypisania:</strong>
+            <span>{{ assignment.assignedAt | date:'dd.MM.yyyy HH:mm' }}</span>
+          </div>
+          <div class="detail-item" *ngIf="assignment.expectedReturnDate && assignment.isActive">
+            <strong>Oczekiwany zwrot:</strong>
+            <span
+              [ngClass]="{'overdue': isOverdue(assignment.expectedReturnDate)}"
+            >
+              {{ assignment.expectedReturnDate | date:'dd.MM.yyyy' }}
+            </span>
+          </div>
+          <div class="detail-item" *ngIf="assignment.returnedAt">
+            <strong>Data zwrotu:</strong>
+            <span>{{ assignment.returnedAt | date:'dd.MM.yyyy HH:mm' }}</span>
+          </div>
+          <div class="detail-item" *ngIf="assignment.notes">
+            <strong>Uwagi:</strong>
+            <span>{{ assignment.notes }}</span>
+          </div>
+        </div>
+
+        <div class="assignment-status">
+          <span
+            class="status-indicator"
+            [ngClass]="assignment.isActive ? 'active' : 'returned'"
+          >
+            {{ assignment.isActive ? 'Aktywne' : 'Zakończone' }}
+          </span>
+        </div>
+
+        <div class="assignment-actions">
+          <button
+            [routerLink]="['/assignments', assignment.id]"
+            class="btn btn-sm btn-outline"
+          >
+            Szczegóły
+          </button>
+          <button
+            *ngIf="canManage && assignment.isActive"
+            (click)="returnAsset(assignment)"
+            class="btn btn-sm btn-warning"
+            [disabled]="returningAsset === assignment.id"
+          >
+            {{ returningAsset === assignment.id ? 'Zwracanie...' : 'Zwróć sprzęt' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="pagination" *ngIf="pagedResult.totalPages > 1">
+      <button
+        (click)="changePage(pagedResult.page - 1)"
+        [disabled]="!pagedResult.hasPreviousPage"
+        class="btn btn-sm"
+      >
+        Poprzednia
+      </button>
+
+      <span class="page-info">
+        Strona {{ pagedResult.page }} z {{ pagedResult.totalPages }}
+        ({{ pagedResult.totalCount }} przypisań)
+      </span>
+
+      <button
+        (click)="changePage(pagedResult.page + 1)"
+        [disabled]="!pagedResult.hasNextPage"
+        class="btn btn-sm"
+      >
+        Następna
+      </button>
+    </div>
+
+    <ng-template #noAssignments>
+      <div class="empty-state">
+        <h3>Brak przypisań</h3>
+        <p>Nie znaleziono przypisań spełniających kryteria.</p>
+        <button
+          *ngIf="canManage"
+          routerLink="/assignments/create"
+          class="btn btn-primary"
+        >
+          Dodaj pierwsze przypisanie
+        </button>
+      </div>
+    </ng-template>
+  </div>
+
+
+  <div *ngIf="errorMessage" class="error-banner">
+    {{ errorMessage }}
+  </div>
+</div>

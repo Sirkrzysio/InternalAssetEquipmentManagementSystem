@@ -1,0 +1,73 @@
+﻿/* Asset Detail Specific Styles */
+.section-loading {
+  display: flex;
+  justify-content: center;
+  padding: 40px 0;
+}
+
+.assignments-list,
+.audit-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.assignment-item {
+  border: 1px solid #eee;
+  border-radius: 6px;
+  padding: 15px;
+  background: #fafafa;
+}
+
+.assignment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.assignment-type {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.assignment-details p {
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+.assignment-status {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.audit-item {
+  border: 1px solid #eee;
+  border-radius: 6px;
+  padding: 15px;
+  background: #f9f9f9;
+}
+
+.audit-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.audit-date {
+  font-size: 12px;
+  color: #666;
+}
+
+.audit-item p {
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+.status-text {
+  font-weight: 500;
+}

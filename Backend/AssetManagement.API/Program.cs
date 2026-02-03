@@ -43,8 +43,8 @@ if (app.Environment.IsDevelopment())
 
 // Middleware
 app.UseExceptionHandling();
-app.UseHttpsRedirection();
 app.UseCors("AllowAll");
+app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();

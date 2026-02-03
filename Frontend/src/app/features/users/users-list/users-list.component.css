@@ -1,0 +1,99 @@
+﻿/* Users List Specific Styles */
+.filter-buttons + .filter-buttons {
+  margin-top: 10px;
+}
+
+.user-info {
+  flex: 1;
+}
+
+.users-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+.user-card {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+.user-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.user-card.inactive {
+  opacity: 0.6;
+}
+
+.user-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
+}
+
+.user-name {
+  margin: 0 0 5px 0;
+  font-size: 18px;
+  color: #333;
+}
+
+.user-email {
+  margin: 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.user-badges {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: flex-end;
+}
+
+.user-details {
+  margin-bottom: 20px;
+}
+
+.user-details p {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.user-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding-top: 15px;
+  border-top: 1px solid #eee;
+}
+
+.user-actions .btn {
+  flex: 1;
+  min-width: 80px;
+}
+
+@media (max-width: 768px) {
+  .users-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .user-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .user-badges {
+    align-items: flex-start;
+  }
+
+  .user-actions {
+    flex-direction: column;
+  }
+}

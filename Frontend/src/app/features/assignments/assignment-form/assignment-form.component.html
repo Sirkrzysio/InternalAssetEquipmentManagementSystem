@@ -1,0 +1,138 @@
+﻿<div class="form-container">
+  <div class="form-header">
+    <h1>Nowe Przypisanie Sprzętu</h1>
+    <button routerLink="/assignments" class="btn btn-ghost">
+      ← Powrót do listy
+    </button>
+  </div>
+
+  <div *ngIf="isLoading" class="loading-container">
+    <app-loading-spinner message="Ładowanie danych..."></app-loading-spinner>
+  </div>
+
+  <form [formGroup]="assignmentForm" (ngSubmit)="onSubmit()" *ngIf="!isLoading" class="assignment-form">
+    <div class="form-grid">
+      <!-- Wybór sprzętu -->
+      <div class="form-section">
+        <h3>Sprzęt do przypisania</h3>
+
+        <div class="form-field">
+          <label for="assetId">Wybierz sprzęt *</label>
+          <select
+            id="assetId"
+            formControlName="assetId"
+            [class.error]="assetIdErrors"
+            (change)="onAssetSelected($event)"
+          >
+            <option value="">Wybierz sprzęt...</option>
+            <option *ngFor="let asset of availableAssets" [value]="asset.id">
+              {{ asset.name }} (S/N: {{ asset.serialNumber }})
+            </option>
+          </select>
+          <span class="error-message" *ngIf="assetIdErrors">{{ assetIdErrors }}</span>
+        </div>
+
+        <div class="asset-preview" *ngIf="selectedAsset">
+          <h4>Podgląd wybranego sprzętu:</h4>
+          <div class="asset-info">
+            <p><strong>Nazwa:</strong> {{ selectedAsset.name }}</p>
+            <p><strong>Kategoria:</strong> {{ selectedAsset.categoryName }}</p>
+            <p><strong>Lokalizacja:</strong> {{ selectedAsset.locationName || 'Brak' }}</p>
+            <p *ngIf="selectedAsset.description"><strong>Opis:</strong> {{ selectedAsset.description }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Wybór użytkownika -->
+      <div class="form-section">
+        <h3>Użytkownik</h3>
+
+        <div class="form-field">
+          <label for="userId">Przypisz do użytkownika *</label>
+          <select
+            id="userId"
+            formControlName="userId"
+            [class.error]="userIdErrors"
+            (change)="onUserSelected($event)"
+          >
+            <option value="">Wybierz użytkownika...</option>
+            <option *ngFor="let user of users" [value]="user.id">
+              {{ user.firstName }} {{ user.lastName }} ({{ user.email }})
+            </option>
+          </select>
+          <span class="error-message" *ngIf="userIdErrors">{{ userIdErrors }}</span>
+        </div>
+
+        <div class="user-preview" *ngIf="selectedUser">
+          <h4>Podgląd wybranego użytkownika:</h4>
+          <div class="user-info">
+            <p><strong>Imię i nazwisko:</strong> {{ selectedUser.firstName }} {{ selectedUser.lastName }}</p>
+            <p><strong>Email:</strong> {{ selectedUser.email }}</p>
+            <p><strong>Dział:</strong> {{ selectedUser.department || 'Brak' }}</p>
+            <p><strong>Rola:</strong> {{ selectedUser.roleName }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Szczegóły przypisania -->
+      <div class="form-section full-width">
+        <h3>Szczegóły przypisania</h3>
+
+        <div class="form-row">
+          <div class="form-field">
+            <label for="type">Typ przypisania *</label>
+            <select
+              id="type"
+              formControlName="type"
+              [class.error]="typeErrors"
+            >
+              <option value="">Wybierz typ...</option>
+              <option *ngFor="let type of assignmentTypes" [value]="type.value">
+                {{ type.label }}
+              </option>
+            </select>
+            <span class="error-message" *ngIf="typeErrors">{{ typeErrors }}</span>
+          </div>
+
+          <div class="form-field">
+            <label for="expectedReturnDate">Oczekiwana data zwrotu</label>
+            <input
+              id="expectedReturnDate"
+              type="date"
+              formControlName="expectedReturnDate"
+              [min]="minReturnDate"
+            >
+            <small class="field-hint">Opcjonalna - tylko dla przypisań czasowych</small>
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label for="notes">Uwagi</label>
+          <textarea
+            id="notes"
+            formControlName="notes"
+            placeholder="Dodatkowe informacje o przypisaniu..."
+            rows="4"
+          ></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" routerLink="/assignments" class="btn btn-ghost">
+        Anuluj
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="assignmentForm.invalid || isSubmitting"
+      >
+        {{ isSubmitting ? 'Tworzenie...' : 'Utwórz przypisanie' }}
+      </button>
+    </div>
+  </form>
+
+  <div *ngIf="errorMessage" class="error-banner">
+    {{ errorMessage }}
+  </div>
+</div>

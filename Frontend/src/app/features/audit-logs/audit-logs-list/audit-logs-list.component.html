@@ -1,0 +1,159 @@
+﻿<div class="audit-logs-container">
+  <header class="page-header">
+    <div class="header-content">
+      <h1>Logi Audytu</h1>
+      <span class="admin-badge">Tylko dla Administratorów</span>
+    </div>
+  </header>
+
+  <div class="filters-section">
+    <div class="filter-row">
+      <div class="filter-field">
+        <label for="entityName">Typ encji</label>
+        <select [formControl]="entityNameFilter" id="entityName">
+          <option value="">Wszystkie typy</option>
+          <option value="Asset">Aktywa</option>
+          <option value="Assignment">Przypisania</option>
+          <option value="User">Użytkownicy</option>
+          <option value="Category">Kategorie</option>
+          <option value="Location">Lokalizacje</option>
+        </select>
+      </div>
+
+      <div class="filter-field">
+        <label for="action">Akcja</label>
+        <select [formControl]="actionFilter" id="action">
+          <option value="">Wszystkie akcje</option>
+          <option value="Create">Utworzenie</option>
+          <option value="Update">Aktualizacja</option>
+          <option value="Delete">Usunięcie</option>
+          <option value="Restore">Przywrócenie</option>
+        </select>
+      </div>
+
+      <div class="filter-field">
+        <label for="dateFrom">Data od</label>
+        <input
+          type="date"
+          [formControl]="dateFromFilter"
+          id="dateFrom"
+          [max]="maxDate"
+        >
+      </div>
+    </div>
+
+    <div class="filter-row">
+      <div class="filter-field">
+        <label for="dateTo">Data do</label>
+        <input
+          type="date"
+          [formControl]="dateToFilter"
+          id="dateTo"
+          [max]="maxDate"
+        >
+      </div>
+
+      <div class="filter-field">
+        <label for="userEmail">Email użytkownika</label>
+        <input
+          type="email"
+          [formControl]="userEmailFilter"
+          id="userEmail"
+          placeholder="Szukaj po email..."
+        >
+      </div>
+
+      <div class="filter-actions">
+        <button (click)="clearFilters()" class="btn btn-ghost">
+          Wyczyść filtry
+        </button>
+        <button (click)="applyFilters()" class="btn btn-primary">
+          Zastosuj filtry
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div [hidden]="!isLoading">
+    <app-loading-spinner message="Ładowanie logów audytu..."></app-loading-spinner>
+  </div>
+
+  <!-- Content -->
+  <div [hidden]="isLoading">
+    <div class="audit-logs-list" *ngIf="auditLogs.length > 0; else noLogs">
+      <div class="audit-log-card" *ngFor="let log of auditLogs">
+        <div class="audit-log-header">
+          <div class="audit-action">
+            <span class="action-badge" [ngClass]="'action-' + log.action.toLowerCase()">
+              {{ getActionLabel(log.action) }}
+            </span>
+            <span class="entity-badge" [ngClass]="'entity-' + log.entityName.toLowerCase()">
+              {{ getEntityLabel(log.entityName) }}
+            </span>
+          </div>
+          <div class="audit-timestamp">
+            {{ log.timestamp | date:'dd.MM.yyyy HH:mm:ss' }}
+          </div>
+        </div>
+
+        <div class="audit-log-body">
+          <div class="audit-info">
+            <div class="audit-info-item">
+              <label>ID Encji</label>
+              <span>{{ log.entityId }}</span>
+            </div>
+            <div class="audit-info-item" *ngIf="log.userEmail">
+              <label>Użytkownik</label>
+              <span>{{ log.userEmail }}</span>
+            </div>
+            <div class="audit-info-item" *ngIf="log.ipAddress">
+              <label>Adres IP</label>
+              <span>{{ log.ipAddress }}</span>
+            </div>
+          </div>
+
+          <div class="audit-changes" *ngIf="log.changes">
+            <h5>Szczegóły zmian:</h5>
+            <div class="changes-json">{{ formatChanges(log.changes) }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pagination" *ngIf="pagedResult.totalPages > 1">
+      <button
+        (click)="changePage(pagedResult.page - 1)"
+        [disabled]="!pagedResult.hasPreviousPage"
+        class="btn btn-sm"
+      >
+        Poprzednia
+      </button>
+
+      <span class="page-info">
+        Strona {{ pagedResult.page }} z {{ pagedResult.totalPages }}
+        ({{ pagedResult.totalCount }} wpisów)
+      </span>
+
+      <button
+        (click)="changePage(pagedResult.page + 1)"
+        [disabled]="!pagedResult.hasNextPage"
+        class="btn btn-sm"
+      >
+        Następna
+      </button>
+    </div>
+
+    <ng-template #noLogs>
+      <div class="empty-state">
+        <h3>Brak logów audytu</h3>
+        <p>Nie znaleziono logów spełniających wybrane kryteria.</p>
+      </div>
+    </ng-template>
+  </div>
+
+
+  <div *ngIf="errorMessage" class="error-banner">
+    {{ errorMessage }}
+  </div>
+</div>

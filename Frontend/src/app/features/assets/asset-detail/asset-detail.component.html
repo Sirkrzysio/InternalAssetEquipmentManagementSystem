@@ -1,0 +1,140 @@
+﻿<div class="detail-container">
+  <div class="detail-header">
+    <div class="header-info">
+      <h1>{{ asset?.name || 'Aktywo' }}</h1>
+      <span class="status-badge" *ngIf="asset && asset.status !== undefined" [ngClass]="'status-' + asset.status.toString().toLowerCase()">
+        {{ asset.status | assetStatus }}
+      </span>
+    </div>
+    <div class="header-actions">
+      <button routerLink="/assets" class="btn btn-ghost">
+        ← Powrót do listy
+      </button>
+      <button
+        *ngIf="canManage && asset"
+        [routerLink]="['/assets/edit', asset.id]"
+        class="btn btn-primary"
+      >
+        Edytuj
+      </button>
+    </div>
+  </div>
+
+  <!-- Spinner -->
+  <ng-container *ngIf="isLoading; else contentTpl">
+    <app-loading-spinner message="Ładowanie szczegółów..."></app-loading-spinner>
+  </ng-container>
+
+  <!-- Content -->
+  <ng-template #contentTpl>
+    <div *ngIf="asset" class="detail-content">
+      <!-- Podstawowe informacje -->
+      <div class="info-card">
+        <h2>Podstawowe informacje</h2>
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Nazwa:</label>
+            <span>{{ asset.name }}</span>
+          </div>
+          <div class="info-item">
+            <label>Numer seryjny:</label>
+            <span>{{ asset.serialNumber }}</span>
+          </div>
+          <div class="info-item">
+            <label>Kategoria:</label>
+            <span>{{ asset.categoryName }}</span>
+          </div>
+          <div class="info-item">
+            <label>Lokalizacja:</label>
+            <span>{{ asset.locationName || 'Nie przypisano' }}</span>
+          </div>
+          <div class="info-item">
+            <label>Status:</label>
+            <span class="status-text">{{ (asset.status !== undefined) ? (asset.status | assetStatus) : '-' }}</span>
+          </div>
+          <div class="info-item" *ngIf="asset.description">
+            <label>Opis:</label>
+            <span>{{ asset.description }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Informacje finansowe -->
+      <div class="info-card" *ngIf="asset.purchasePrice || asset.purchaseDate">
+        <h2>Informacje finansowe</h2>
+        <div class="info-grid">
+          <div class="info-item" *ngIf="asset.purchasePrice">
+            <label>Cena zakupu:</label>
+            <span>{{ asset.purchasePrice | currency:'PLN':'symbol':'1.2-2' }}</span>
+          </div>
+          <div class="info-item" *ngIf="asset.purchaseDate">
+            <label>Data zakupu:</label>
+            <span>{{ asset.purchaseDate | date:'dd.MM.yyyy' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Historia przypisań -->
+      <div class="info-card">
+        <h2>Historia przypisań</h2>
+        <div *ngIf="assignmentsLoading" class="section-loading">
+          <app-loading-spinner message="Ładowanie przypisań..."></app-loading-spinner>
+        </div>
+        <div *ngIf="!assignmentsLoading && assignments.length === 0" class="empty-state">
+          <p>Brak historii przypisań dla tego aktywa</p>
+        </div>
+        <div *ngIf="!assignmentsLoading && assignments.length > 0" class="assignments-list">
+          <div class="assignment-item" *ngFor="let assignment of assignments">
+            <div class="assignment-header">
+              <strong>{{ assignment.userFullName }}</strong>
+              <span class="assignment-type" [ngClass]="'type-' + assignment.type">
+                {{ assignment.type | assignmentType }}
+              </span>
+            </div>
+            <div class="assignment-details">
+              <p><strong>Email:</strong> {{ assignment.userEmail }}</p>
+              <p><strong>Data przypisania:</strong> {{ assignment.assignedAt | date:'dd.MM.yyyy HH:mm' }}</p>
+              <p *ngIf="assignment.returnedAt">
+                <strong>Data zwrotu:</strong> {{ assignment.returnedAt | date:'dd.MM.yyyy HH:mm' }}
+              </p>
+              <p *ngIf="!assignment.returnedAt && assignment.expectedReturnDate">
+                <strong>Oczekiwany zwrot:</strong> {{ assignment.expectedReturnDate | date:'dd.MM.yyyy' }}
+              </p>
+              <p *ngIf="assignment.notes"><strong>Uwagi:</strong> {{ assignment.notes }}</p>
+            </div>
+            <div class="assignment-status">
+              <span class="status-indicator" [ngClass]="assignment.isActive ? 'active' : 'returned'">
+                {{ assignment.isActive ? 'Aktywne' : 'Zakończone' }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Logi audytu -->
+      <div class="info-card" *ngIf="canViewAudit">
+        <h2>Historia zmian</h2>
+        <div *ngIf="auditLoading" class="section-loading">
+          <app-loading-spinner message="Ładowanie historii..."></app-loading-spinner>
+        </div>
+        <div *ngIf="!auditLoading && auditLogs.length === 0" class="empty-state">
+          <p>Brak historii zmian dla tego aktywa</p>
+        </div>
+        <div *ngIf="!auditLoading && auditLogs.length > 0" class="audit-list">
+          <div class="audit-item" *ngFor="let log of auditLogs">
+            <div class="audit-header">
+              <strong>{{ log.action }}</strong>
+              <span class="audit-date">{{ log.timestamp | date:'dd.MM.yyyy HH:mm' }}</span>
+            </div>
+            <p *ngIf="log.userEmail"><strong>Użytkownik:</strong> {{ log.userEmail }}</p>
+            <p *ngIf="log.changes"><strong>Zmiany:</strong> {{ log.changes }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <div *ngIf="errorMessage" class="error-banner">
+    {{ errorMessage }}
+  </div>
+</div>

@@ -1,0 +1,75 @@
+﻿<header class="page-header">
+  <!-- Breadcrumbs -->
+  <nav class="breadcrumbs" *ngIf="breadcrumbs && breadcrumbs.length > 0">
+    <ol class="breadcrumb-list">
+      <li *ngFor="let crumb of breadcrumbs; let last = last" class="breadcrumb-item">
+        <a *ngIf="crumb.route && !last" [routerLink]="crumb.route" class="breadcrumb-link">
+          {{ crumb.label }}
+        </a>
+        <span *ngIf="!crumb.route || last" class="breadcrumb-current">
+          {{ crumb.label }}
+        </span>
+        <span *ngIf="!last" class="breadcrumb-separator">/</span>
+      </li>
+    </ol>
+  </nav>
+
+  <!-- Main Header Content -->
+  <div class="header-content">
+    <div class="header-left">
+      <div class="header-icon" *ngIf="icon">
+        <span>{{ icon }}</span>
+      </div>
+      <div class="header-text">
+        <h1 class="page-title">{{ title }}</h1>
+        <p *ngIf="subtitle" class="page-subtitle">{{ subtitle }}</p>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <!-- Search Box -->
+      <div class="search-container" *ngIf="showSearch">
+        <input
+          type="text"
+          class="search-input"
+          [placeholder]="searchPlaceholder"
+          [(ngModel)]="searchValue"
+          (input)="onSearchChange()"
+        >
+        <span class="search-icon">🔍</span>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="actions" *ngIf="actions && actions.length > 0">
+        <ng-container *ngFor="let action of actions">
+          <a
+            *ngIf="action.route && !action.hidden"
+            [routerLink]="action.route"
+            [class]="'btn ' + (action.class || 'btn-primary')"
+            [attr.disabled]="action.disabled"
+          >
+            <span *ngIf="action.icon" class="btn-icon">{{ action.icon }}</span>
+            {{ action.label }}
+          </a>
+          <button
+            *ngIf="!action.route && !action.hidden"
+            (click)="executeAction(action)"
+            [class]="'btn ' + (action.class || 'btn-primary')"
+            [disabled]="action.disabled"
+          >
+            <span *ngIf="action.icon" class="btn-icon">{{ action.icon }}</span>
+            {{ action.label }}
+          </button>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats/Metrics -->
+  <div class="header-stats" *ngIf="stats && stats.length > 0">
+    <div *ngFor="let stat of stats" class="stat-item">
+      <div class="stat-value">{{ stat.value }}</div>
+      <div class="stat-label">{{ stat.label }}</div>
+    </div>
+  </div>
+</header>

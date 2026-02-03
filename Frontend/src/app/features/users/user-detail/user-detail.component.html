@@ -1,0 +1,134 @@
+﻿<div class="detail-container">
+  <div class="detail-header">
+    <div class="header-info">
+      <h1>{{ user?.fullName || 'Użytkownik' }}</h1>
+      <div class="user-badges" *ngIf="user">
+        <span class="role-badge" [ngClass]="'role-' + user.role.toString().toLowerCase()">
+          {{ user.roleName }}
+        </span>
+        <span class="status-badge" [ngClass]="user.isActive ? 'status-active' : 'status-inactive'">
+          {{ user.isActive ? 'Aktywny' : 'Nieaktywny' }}
+        </span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button routerLink="/users" class="btn btn-ghost">
+        ← Powrót do listy
+      </button>
+      <button
+        *ngIf="canManage"
+        [routerLink]="['/users/edit', user?.id]"
+        class="btn btn-primary"
+      >
+        Edytuj użytkownika
+      </button>
+      <button
+        *ngIf="canManage && user?.isActive && !isCurrentUser"
+        (click)="deactivateUser()"
+        class="btn btn-warning"
+        [disabled]="isDeactivating"
+      >
+        {{ isDeactivating ? 'Dezaktywowanie...' : 'Dezaktywuj' }}
+      </button>
+      <button
+        *ngIf="canManage && !user?.isActive"
+        (click)="activateUser()"
+        class="btn btn-primary"
+        [disabled]="isActivating"
+      >
+        {{ isActivating ? 'Aktywowanie...' : 'Aktywuj' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Spinner -->
+  <ng-container *ngIf="isLoading; else contentTpl">
+    <app-loading-spinner message="Ładowanie danych użytkownika..."></app-loading-spinner>
+  </ng-container>
+
+  <!-- Content -->
+  <ng-template #contentTpl>
+    <div *ngIf="user" class="detail-content">
+      <!-- Informacje osobowe -->
+      <div class="info-card">
+        <h2>Informacje osobowe</h2>
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Imię i nazwisko:</label>
+            <span>{{ user.fullName }}</span>
+          </div>
+          <div class="info-item">
+            <label>Email:</label>
+            <span>{{ user.email }}</span>
+          </div>
+          <div class="info-item" *ngIf="user.phoneNumber">
+            <label>Telefon:</label>
+            <span>{{ user.phoneNumber }}</span>
+          </div>
+          <div class="info-item" *ngIf="user.department">
+            <label>Dział:</label>
+            <span>{{ user.department }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Informacje systemowe -->
+      <div class="info-card">
+        <h2>Informacje systemowe</h2>
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Rola:</label>
+            <span class="role-badge" [ngClass]="'role-' + user.role.toString().toLowerCase()">
+              {{ user.roleName }}
+            </span>
+          </div>
+          <div class="info-item">
+            <label>Status:</label>
+            <span class="status-badge" [ngClass]="user.isActive ? 'status-active' : 'status-inactive'">
+              {{ user.isActive ? 'Aktywny' : 'Nieaktywny' }}
+            </span>
+          </div>
+          <div class="info-item">
+            <label>Data utworzenia:</label>
+            <span>{{ user.createdAt | date:'dd.MM.yyyy HH:mm' }}</span>
+          </div>
+          <div class="info-item" *ngIf="user.updatedAt">
+            <label>Ostatnia aktualizacja:</label>
+            <span>{{ user.updatedAt | date:'dd.MM.yyyy HH:mm' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Uprawnienia -->
+      <div class="info-card">
+        <h2>Uprawnienia</h2>
+        <div class="permissions-list">
+          <div class="permission-item" [class.granted]="hasPermission('view_assets')">
+            <span class="permission-icon">👁️</span>
+            <span class="permission-name">Przeglądanie aktywów</span>
+            <span class="permission-status">{{ hasPermission('view_assets') ? 'Przyznane' : 'Brak' }}</span>
+          </div>
+          <div class="permission-item" [class.granted]="hasPermission('manage_assets')">
+            <span class="permission-icon">⚙️</span>
+            <span class="permission-name">Zarządzanie aktywami</span>
+            <span class="permission-status">{{ hasPermission('manage_assets') ? 'Przyznane' : 'Brak' }}</span>
+          </div>
+          <div class="permission-item" [class.granted]="hasPermission('manage_users')">
+            <span class="permission-icon">👥</span>
+            <span class="permission-name">Zarządzanie użytkownikami</span>
+            <span class="permission-status">{{ hasPermission('manage_users') ? 'Przyznane' : 'Brak' }}</span>
+          </div>
+          <div class="permission-item" [class.granted]="hasPermission('view_audit')">
+            <span class="permission-icon">📋</span>
+            <span class="permission-name">Podgląd logów audytu</span>
+            <span class="permission-status">{{ hasPermission('view_audit') ? 'Przyznane' : 'Brak' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <div *ngIf="errorMessage" class="error-banner">
+    {{ errorMessage }}
+  </div>
+</div>

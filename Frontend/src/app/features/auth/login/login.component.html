@@ -1,0 +1,51 @@
+﻿<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <h1>Zarządzanie Majątkiem</h1>
+      <p>Zaloguj się do systemu</p>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          type="email"
+          id="email"
+          formControlName="email"
+          [class.error]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+          placeholder="Wprowadź email"
+        >
+        <div *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" class="error-message">
+          Email jest wymagany
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Hasło</label>
+        <input
+          type="password"
+          id="password"
+          formControlName="password"
+          [class.error]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+          placeholder="Wprowadź hasło"
+        >
+        <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" class="error-message">
+          Hasło jest wymagane
+        </div>
+      </div>
+
+      <div *ngIf="errorMessage" class="alert-error">
+        {{ errorMessage }}
+      </div>
+
+      <button
+        type="submit"
+        [disabled]="loginForm.invalid || isLoading"
+        class="login-btn"
+      >
+        <app-loading-spinner *ngIf="isLoading" size="small"></app-loading-spinner>
+        <span *ngIf="!isLoading">Zaloguj</span>
+      </button>
+    </form>
+  </div>
+</div>

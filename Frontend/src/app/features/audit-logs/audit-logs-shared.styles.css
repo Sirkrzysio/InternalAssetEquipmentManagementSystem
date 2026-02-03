@@ -1,0 +1,328 @@
+﻿
+
+/* Common Container Styles */
+.audit-logs-container {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Header Styles */
+.page-header {
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.page-header h1 {
+  margin: 0;
+  font-size: 24px;
+  color: #333;
+}
+
+/* Filters Section */
+.filters-section {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 30px;
+}
+
+.filter-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.filter-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.filter-field label {
+  margin-bottom: 5px;
+  font-weight: 500;
+  color: #555;
+  font-size: 14px;
+}
+
+.filter-field input,
+.filter-field select {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.filter-field input:focus,
+.filter-field select:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.filter-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* Button Styles */
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.btn-primary {
+  background-color: #3498db;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #2980b9;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: #666;
+  border: 1px solid #ddd;
+}
+
+.btn-ghost:hover {
+  background: #f8f9fa;
+  border-color: #bbb;
+}
+
+/* Audit Log Cards */
+.audit-logs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.audit-log-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  overflow: hidden;
+  transition: transform 0.2s;
+}
+
+.audit-log-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.audit-log-header {
+  padding: 15px 20px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.audit-action {
+  font-weight: 600;
+  color: #333;
+  font-size: 16px;
+}
+
+.audit-timestamp {
+  font-size: 12px;
+  color: #666;
+}
+
+.audit-log-body {
+  padding: 20px;
+}
+
+.audit-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.audit-info-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.audit-info-item label {
+  font-weight: 600;
+  color: #555;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 5px;
+}
+
+.audit-info-item span {
+  color: #333;
+  font-size: 14px;
+}
+
+.audit-changes {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 4px;
+  border-left: 4px solid #3498db;
+  margin-top: 15px;
+}
+
+.audit-changes h5 {
+  margin: 0 0 10px 0;
+  font-size: 14px;
+  color: #333;
+}
+
+.changes-json {
+  background: #2c3e50;
+  color: #ecf0f1;
+  padding: 12px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  white-space: pre-wrap;
+  overflow-x: auto;
+}
+
+/* Action Badges */
+.action-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.action-create { background: #d4edda; color: #155724; }
+.action-update { background: #fff3cd; color: #856404; }
+.action-delete { background: #f8d7da; color: #721c24; }
+.action-restore { background: #d1ecf1; color: #0c5460; }
+
+/* Entity Type Badges */
+.entity-badge {
+  padding: 3px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.entity-asset { background: #e3f2fd; color: #1565c0; }
+.entity-assignment { background: #f3e5f5; color: #7b1fa2; }
+.entity-user { background: #e8f5e8; color: #2e7d32; }
+.entity-category { background: #fff3e0; color: #ef6c00; }
+.entity-location { background: #fce4ec; color: #c2185b; }
+
+/* Loading and Empty States */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  padding: 60px 0;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.empty-state h3 {
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.empty-state p {
+  color: #999;
+  margin-bottom: 30px;
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 30px;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.page-info {
+  font-size: 14px;
+  color: #666;
+}
+
+/* Error Messages */
+.error-banner {
+  background: #ffe6e6;
+  color: #c53030;
+  padding: 15px;
+  border-radius: 4px;
+  margin-top: 20px;
+  border: 1px solid #fed7d7;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .audit-logs-container {
+    padding: 10px;
+  }
+
+  .header-content {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+  }
+
+  .filter-row {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .filter-actions {
+    flex-direction: column;
+  }
+
+  .audit-log-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .audit-info {
+    grid-template-columns: 1fr;
+  }
+
+  .pagination {
+    flex-direction: column;
+    gap: 10px;
+  }
+}

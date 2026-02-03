@@ -1,0 +1,14 @@
+﻿/* Audit Logs List Specific Styles */
+.admin-badge {
+  padding: 4px 8px;
+  background: #dc3545;
+  color: white;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.filter-row:last-child .filter-actions {
+  align-self: end;
+}

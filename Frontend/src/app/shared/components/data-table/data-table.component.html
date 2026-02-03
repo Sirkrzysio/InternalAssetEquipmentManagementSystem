@@ -1,0 +1,65 @@
+﻿<div class="data-table-container">
+  <div class="table-header" *ngIf="showSearch">
+    <div class="search-box">
+      <input
+        type="text"
+        placeholder="Szukaj..."
+        [(ngModel)]="searchTerm"
+        (input)="onSearch()"
+        class="search-input"
+      >
+    </div>
+  </div>
+
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th
+            *ngFor="let column of columns"
+            [style.width]="column.width || 'auto'"
+            [class.sortable]="column.sortable"
+            (click)="column.sortable ? onSort(column.key) : null"
+          >
+            {{ column.label }}
+            <span *ngIf="column.sortable && sortField === column.key" class="sort-indicator">
+              {{ sortDirection === 'asc' ? '↑' : '↓' }}
+            </span>
+          </th>
+          <th *ngIf="actions && actions.length > 0" class="actions-column">Akcje</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of filteredData; trackBy: trackByFn" [class.clickable]="rowClickable" (click)="onRowClick(item)">
+          <td *ngFor="let column of columns">
+            <ng-container [ngSwitch]="column.type || 'text'">
+              <span *ngSwitchCase="'text'">{{ getNestedValue(item, column.key) }}</span>
+              <span *ngSwitchCase="'date'">{{ getNestedValue(item, column.key) | date:'short' }}</span>
+              <span *ngSwitchCase="'number'">{{ getNestedValue(item, column.key) | number }}</span>
+              <span *ngSwitchCase="'badge'"
+                    class="badge"
+                    [ngClass]="'badge-' + getNestedValue(item, column.key).toLowerCase()">
+                {{ getNestedValue(item, column.key) }}
+              </span>
+            </ng-container>
+          </td>
+          <td *ngIf="actions && actions.length > 0" class="actions-cell">
+            <button
+              *ngFor="let action of actions"
+              (click)="executeAction(action, item, $event)"
+              [class]="'btn btn-sm ' + (action.class || 'btn-outline')"
+              [title]="action.label"
+            >
+              <span *ngIf="action.icon">{{ action.icon }}</span>
+              {{ action.label }}
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="filteredData.length === 0" class="empty-state">
+      <p>Brak danych do wyświetlenia</p>
+    </div>
+  </div>
+</div>

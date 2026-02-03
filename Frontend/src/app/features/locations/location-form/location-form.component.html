@@ -1,0 +1,113 @@
+﻿<div class="form-container">
+  <div class="form-header">
+    <h1>{{ isEditMode ? 'Edytuj Lokalizację' : 'Nowa Lokalizacja' }}</h1>
+    <button routerLink="/locations" class="btn btn-ghost">
+      ← Powrót do listy
+    </button>
+  </div>
+
+  <div *ngIf="isLoading" class="loading-container">
+    <app-loading-spinner message="Ładowanie danych lokalizacji..."></app-loading-spinner>
+  </div>
+
+  <form [formGroup]="locationForm" (ngSubmit)="onSubmit()" *ngIf="!isLoading" class="location-form">
+    <div class="form-grid">
+      <!-- Podstawowe informacje -->
+      <div class="form-section">
+        <h3>Podstawowe informacje</h3>
+
+        <div class="form-field">
+          <label for="name">Nazwa lokalizacji *</label>
+          <input
+            id="name"
+            type="text"
+            formControlName="name"
+            placeholder="np. Biuro Główne, Magazyn A1, Sala Konferencyjna..."
+            [class.error]="nameErrors"
+          >
+          <span class="error-message" *ngIf="nameErrors">{{ nameErrors }}</span>
+        </div>
+
+        <div class="form-field">
+          <label for="description">Opis</label>
+          <textarea
+            id="description"
+            formControlName="description"
+            placeholder="Dodatkowe informacje o lokalizacji..."
+            rows="3"
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Szczegóły lokalizacji -->
+      <div class="form-section">
+        <h3>Szczegóły lokalizacji</h3>
+
+        <div class="form-field">
+          <label for="building">Budynek</label>
+          <input
+            id="building"
+            type="text"
+            formControlName="building"
+            placeholder="np. Budynek A, Główna siedziba..."
+          >
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <label for="floor">Piętro</label>
+            <input
+              id="floor"
+              type="text"
+              formControlName="floor"
+              placeholder="np. 1, 2, Parter..."
+            >
+          </div>
+
+          <div class="form-field">
+            <label for="room">Pokój/Sala</label>
+            <input
+              id="room"
+              type="text"
+              formControlName="room"
+              placeholder="np. 101, Sala A..."
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Adres -->
+      <div class="form-section full-width">
+        <h3>Adres</h3>
+
+        <div class="form-field">
+          <label for="address">Pełny adres</label>
+          <textarea
+            id="address"
+            formControlName="address"
+            placeholder="ul. Przykładowa 1, 00-000 Warszawa"
+            rows="3"
+          ></textarea>
+          <small class="field-hint">Podaj pełny adres lokalizacji wraz z kodem pocztowym</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" routerLink="/locations" class="btn btn-ghost">
+        Anuluj
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="locationForm.invalid || isSubmitting"
+      >
+        {{ isSubmitting ? 'Zapisywanie...' : (isEditMode ? 'Zapisz zmiany' : 'Dodaj lokalizację') }}
+      </button>
+    </div>
+  </form>
+
+  <div *ngIf="errorMessage" class="error-banner">
+    {{ errorMessage }}
+  </div>
+</div>

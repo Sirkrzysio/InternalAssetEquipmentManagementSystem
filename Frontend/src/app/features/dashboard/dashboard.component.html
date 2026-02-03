@@ -1,0 +1,61 @@
+﻿<div class="dashboard">
+  <header class="dashboard-header">
+    <h1>Panel Główny</h1>
+    <div class="user-info">
+      <span>Witaj, {{ currentUser?.fullName }}</span>
+    </div>
+  </header>
+
+  <!-- Loading State -->
+  <div [hidden]="!isLoading">
+    <app-loading-spinner message="Ładowanie panelu głównego..."></app-loading-spinner>
+  </div>
+
+  <!-- Content -->
+  <div class="dashboard-content" [hidden]="isLoading">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3>Aktywa</h3>
+        <div class="stat-number">{{ stats.totalAssets }}</div>
+        <div class="stat-label">Łącznie aktywów</div>
+      </div>
+      <div class="stat-card">
+        <h3>Przypisania</h3>
+        <div class="stat-number">{{ stats.activeAssignments }}</div>
+        <div class="stat-label">Aktywne przypisania</div>
+      </div>
+      <div class="stat-card">
+        <h3>Użytkownicy</h3>
+        <div class="stat-number">{{ stats.totalUsers }}</div>
+        <div class="stat-label">Zarejestrowani użytkownicy</div>
+      </div>
+      <div class="stat-card">
+        <h3>Dostępne</h3>
+        <div class="stat-number">{{ stats.availableAssets }}</div>
+        <div class="stat-label">Dostępne aktywa</div>
+      </div>
+    </div>
+
+    <div class="quick-actions">
+      <h2>Szybkie akcje</h2>
+      <div class="actions-grid">
+        <button (click)="navigate('/assets')" class="action-btn">
+          <span>📦</span>
+          <div>Zarządzaj aktywami</div>
+        </button>
+        <button (click)="navigate('/assignments')" class="action-btn">
+          <span>📋</span>
+          <div>Przypisania</div>
+        </button>
+        <button *ngIf="canManageUsers" (click)="navigate('/users')" class="action-btn">
+          <span>👥</span>
+          <div>Użytkownicy</div>
+        </button>
+        <button *ngIf="canViewAudit" (click)="navigate('/audit-logs')" class="action-btn">
+          <span>📊</span>
+          <div>Logi audytu</div>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

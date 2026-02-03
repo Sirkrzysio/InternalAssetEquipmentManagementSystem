@@ -1,0 +1,120 @@
+﻿<div class="form-container">
+  <div class="form-header">
+    <h1>{{ isEditMode ? 'Edytuj Aktywo' : 'Dodaj Nowe Aktywo' }}</h1>
+    <button routerLink="/assets" class="btn btn-ghost">← Powrót do listy</button>
+  </div>
+
+  <!-- Spinner -->
+  <ng-container *ngIf="isLoading; else formTpl">
+    <app-loading-spinner message="Ładowanie danych..."></app-loading-spinner>
+  </ng-container>
+
+  <!-- Formularz -->
+  <ng-template #formTpl>
+    <form [formGroup]="assetForm" (ngSubmit)="onSubmit()" class="asset-form">
+      <div class="form-grid">
+
+        <!-- Podstawowe informacje -->
+        <div class="form-section">
+          <h3>Podstawowe informacje</h3>
+
+          <div class="form-field">
+            <label for="name">Nazwa aktywa *</label>
+            <input id="name" type="text" formControlName="name" placeholder="np. Laptop Dell XPS 13" [class.error]="nameErrors">
+            <span class="error-message" *ngIf="nameErrors">{{ nameErrors }}</span>
+          </div>
+
+          <div class="form-field">
+            <label for="description">Opis</label>
+            <textarea id="description" formControlName="description" rows="3" placeholder="Dodatkowe informacje o sprzęcie..."></textarea>
+          </div>
+
+          <div class="form-field">
+            <label for="manufacturer">Producent</label>
+            <input id="manufacturer" type="text" formControlName="manufacturer" placeholder="np. Dell, HP, Lenovo..."/>
+          </div>
+
+          <div class="form-field">
+            <label for="model">Model</label>
+            <input id="model" type="text" formControlName="model" placeholder="np. Latitude 5520, EliteBook 850..."/>
+          </div>
+
+          <div class="form-field">
+            <label for="serialNumber">Numer seryjny *</label>
+            <input id="serialNumber" type="text" formControlName="serialNumber" [class.error]="serialNumberErrors">
+            <span class="error-message" *ngIf="serialNumberErrors">{{ serialNumberErrors }}</span>
+          </div>
+        </div>
+
+        <!-- Klasyfikacja -->
+        <div class="form-section">
+          <h3>Klasyfikacja</h3>
+
+          <div class="form-field">
+            <label for="categoryId">Kategoria *</label>
+            <select id="categoryId" formControlName="categoryId" [class.error]="categoryIdErrors">
+              <option value="">Wybierz kategorię...</option>
+              <option *ngFor="let category of categories" [value]="category.id">{{ category.name }}</option>
+            </select>
+            <span class="error-message" *ngIf="categoryIdErrors">{{ categoryIdErrors }}</span>
+          </div>
+
+          <div class="form-field">
+            <label for="locationId">Lokalizacja</label>
+            <select id="locationId" formControlName="locationId">
+              <option value="">Wybierz lokalizację...</option>
+              <option *ngFor="let location of locations" [value]="location.id">{{ location.name }}</option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label for="status">Status</label>
+            <select id="status" formControlName="status">
+              <option [value]="AssetStatus.Available">Dostępne</option>
+              <option [value]="AssetStatus.Assigned">Przypisane</option>
+              <option [value]="AssetStatus.InMaintenance">W serwisie</option>
+              <option [value]="AssetStatus.Retired">Wycofane</option>
+              <option [value]="AssetStatus.Lost">Utracone</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Informacje finansowe -->
+        <div class="form-section">
+          <h3>Informacje finansowe</h3>
+
+          <div class="form-field">
+            <label for="purchasePrice">Cena zakupu (PLN) *</label>
+            <input id="purchasePrice" type="number" step="0.01" min="0" formControlName="purchasePrice" [class.error]="purchasePriceErrors">
+            <span class="error-message" *ngIf="purchasePriceErrors">{{ purchasePriceErrors }}</span>
+          </div>
+
+          <div class="form-field">
+            <label for="purchaseDate">Data zakupu *</label>
+            <input id="purchaseDate" type="date" formControlName="purchaseDate" [class.error]="purchaseDateErrors">
+            <span class="error-message" *ngIf="purchaseDateErrors">{{ purchaseDateErrors }}</span>
+          </div>
+
+          <div class="form-field">
+            <label for="warrantyExpiration">Data wygaśnięcia gwarancji</label>
+            <input id="warrantyExpiration" type="date" formControlName="warrantyExpiration">
+          </div>
+        </div>
+
+      </div>
+
+      <div class="form-actions">
+        <button type="button" routerLink="/assets" class="btn btn-ghost">Anuluj</button>
+        <button *ngIf="isEditMode && canManage" type="button" (click)="onDelete()" class="btn btn-danger" [disabled]="isSubmitting">
+          {{ isSubmitting ? 'Usuwanie...' : 'Usuń aktywo' }}
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="assetForm.invalid || isSubmitting">
+          {{ isSubmitting ? 'Zapisywanie...' : (isEditMode ? 'Zaktualizuj' : 'Dodaj aktywo') }}
+        </button>
+      </div>
+
+    </form>
+  </ng-template>
+
+  <div *ngIf="errorMessage" class="error-banner">{{ errorMessage }}</div>
+</div>

@@ -1,0 +1,54 @@
+﻿/* User Detail Specific Styles */
+.user-badges {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.permissions-list {
+  display: grid;
+  gap: 15px;
+}
+
+.permission-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 12px;
+  border-radius: 6px;
+  background: #f8f9fa;
+  border-left: 4px solid #dee2e6;
+}
+
+.permission-item.granted {
+  background: #d4edda;
+  border-left-color: #28a745;
+}
+
+.permission-icon {
+  font-size: 18px;
+}
+
+.permission-name {
+  flex: 1;
+  font-weight: 500;
+  color: #333;
+}
+
+.permission-status {
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 3px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.permission-item.granted .permission-status {
+  background: #28a745;
+  color: white;
+}
+
+.permission-item:not(.granted) .permission-status {
+  background: #6c757d;
+  color: white;
+}

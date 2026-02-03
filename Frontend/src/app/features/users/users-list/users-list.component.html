@@ -1,0 +1,158 @@
+﻿<div class="users-container">
+  <header class="page-header">
+    <h1>Zarządzanie Użytkownikami</h1>
+    <button
+      *ngIf="canManage"
+      routerLink="/users/create"
+      class="btn btn-primary"
+    >
+      + Dodaj Użytkownika
+    </button>
+  </header>
+
+  <div class="filters-section">
+    <div class="search-box">
+      <input
+        type="text"
+        placeholder="Szukaj użytkowników..."
+        [formControl]="searchControl"
+        class="search-input"
+      >
+    </div>
+
+    <div class="filter-buttons">
+      <button
+        *ngFor="let filter of statusFilters"
+        (click)="filterByStatus(filter.value)"
+        [class.active]="selectedStatusFilter === filter.value"
+        class="filter-btn"
+      >
+        {{ filter.label }}
+      </button>
+    </div>
+
+    <div class="filter-buttons">
+      <button
+        *ngFor="let filter of roleFilters"
+        (click)="filterByRole(filter.value)"
+        [class.active]="selectedRoleFilter === filter.value"
+        class="filter-btn"
+      >
+        {{ filter.label }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div [hidden]="!isLoading">
+    <app-loading-spinner message="Ładowanie użytkowników..."></app-loading-spinner>
+  </div>
+
+  <!-- Content -->
+  <div [hidden]="isLoading">
+    <div class="users-grid" *ngIf="users.length > 0; else noUsers">
+      <div
+        class="user-card"
+        *ngFor="let user of users"
+        [class.inactive]="!user.isActive"
+      >
+        <div class="user-header">
+          <div class="user-info">
+            <h3 class="user-name">{{ user.fullName }}</h3>
+            <p class="user-email">{{ user.email }}</p>
+          </div>
+          <div class="user-badges">
+            <span class="role-badge" [ngClass]="'role-' + user.role.toString().toLowerCase()">
+              {{ user.roleName }}
+            </span>
+            <span class="status-badge" [ngClass]="user.isActive ? 'status-active' : 'status-inactive'">
+              {{ user.isActive ? 'Aktywny' : 'Nieaktywny' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="user-details">
+          <p *ngIf="user.department"><strong>Dział:</strong> {{ user.department }}</p>
+          <p *ngIf="user.phoneNumber"><strong>Telefon:</strong> {{ user.phoneNumber }}</p>
+          <p><strong>Utworzono:</strong> {{ user.createdAt | date:'dd.MM.yyyy' }}</p>
+          <p *ngIf="user.updatedAt">
+            <strong>Zaktualizowano:</strong> {{ user.updatedAt | date:'dd.MM.yyyy' }}
+          </p>
+        </div>
+
+        <div class="user-actions" *ngIf="canManage">
+          <button
+            [routerLink]="['/users', user.id]"
+            class="btn btn-sm btn-outline"
+          >
+            Szczegóły
+          </button>
+          <button
+            [routerLink]="['/users/edit', user.id]"
+            class="btn btn-sm btn-outline"
+          >
+            Edytuj
+          </button>
+          <button
+            *ngIf="user.isActive && !isCurrentUser(user.id)"
+            (click)="deactivateUser(user)"
+            class="btn btn-sm btn-warning"
+            [disabled]="deactivatingUser === user.id"
+          >
+            {{ deactivatingUser === user.id ? 'Dezaktywacja...' : 'Dezaktywuj' }}
+          </button>
+          <button
+            *ngIf="!user.isActive"
+            (click)="activateUser(user)"
+            class="btn btn-sm btn-primary"
+            [disabled]="activatingUser === user.id"
+          >
+            {{ activatingUser === user.id ? 'Aktywacja...' : 'Aktywuj' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="pagination" *ngIf="pagedResult.totalPages > 1">
+      <button
+        (click)="changePage(pagedResult.page - 1)"
+        [disabled]="!pagedResult.hasPreviousPage"
+        class="btn btn-sm"
+      >
+        Poprzednia
+      </button>
+
+      <span class="page-info">
+        Strona {{ pagedResult.page }} z {{ pagedResult.totalPages }}
+        ({{ pagedResult.totalCount }} użytkowników)
+      </span>
+
+      <button
+        (click)="changePage(pagedResult.page + 1)"
+        [disabled]="!pagedResult.hasNextPage"
+        class="btn btn-sm"
+      >
+        Następna
+      </button>
+    </div>
+
+    <ng-template #noUsers>
+      <div class="empty-state">
+        <h3>Brak użytkowników</h3>
+        <p>Nie znaleziono użytkowników spełniających kryteria.</p>
+        <button
+          *ngIf="canManage"
+          routerLink="/users/create"
+          class="btn btn-primary"
+        >
+          Dodaj pierwszego użytkownika
+        </button>
+      </div>
+    </ng-template>
+  </div>
+
+
+  <div *ngIf="errorMessage" class="error-banner">
+    {{ errorMessage }}
+  </div>
+</div>

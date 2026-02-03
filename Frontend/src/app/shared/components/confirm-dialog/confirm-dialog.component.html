@@ -1,0 +1,37 @@
+﻿<div class="modal-overlay" *ngIf="isOpen" (click)="onOverlayClick($event)">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>{{ title }}</h3>
+      <button class="close-btn" (click)="onCancel()" aria-label="Zamknij">×</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="icon-container" [ngClass]="'icon-' + type">
+        <span class="icon">{{ getIcon() }}</span>
+      </div>
+      <p>{{ message }}</p>
+      <div *ngIf="details" class="details">
+        {{ details }}
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button
+        class="btn btn-secondary"
+        (click)="onCancel()"
+        [disabled]="isProcessing"
+      >
+        {{ cancelText }}
+      </button>
+      <button
+        class="btn"
+        [ngClass]="'btn-' + type"
+        (click)="onConfirm()"
+        [disabled]="isProcessing"
+      >
+        <span *ngIf="isProcessing" class="spinner"></span>
+        {{ isProcessing ? processingText : confirmText }}
+      </button>
+    </div>
+  </div>
+</div>

@@ -7,15 +7,8 @@ import { CommonModule } from '@angular/common';
   selector: 'app-category-form',
   standalone: true,
   imports: [CommonModule],
-  template: `
-    <div class="container">
-      <h1>Category Form</h1>
-      <p>Create/Edit category - To be implemented</p>
-    </div>
-  `,
-  styles: [`
-    .container { padding: 20px; }
-  `]
+  templateUrl: './category-form.component.html',
+  styleUrls: ['./category-form.component.css']
 })
 export class CategoryFormComponent {
 }

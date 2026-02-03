@@ -1,0 +1,15 @@
+﻿.app-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1;
+  background-color: #f8f9fa;
+}
+
+/* Ensure content has proper spacing from navbar */
+.main-content > * {
+  padding-top: 0;
+}

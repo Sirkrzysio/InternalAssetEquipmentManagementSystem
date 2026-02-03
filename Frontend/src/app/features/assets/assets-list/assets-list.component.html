@@ -1,0 +1,116 @@
+﻿<div class="assets-container">
+  <header class="page-header">
+    <h1>Zarządzanie Aktywami</h1>
+    <button
+      *ngIf="canManage"
+      routerLink="/assets/create"
+      class="btn btn-primary"
+    >
+      + Dodaj Aktywo
+    </button>
+  </header>
+
+  <div class="filters-section">
+    <div class="search-box">
+      <input
+        type="text"
+        placeholder="Szukaj aktywów..."
+        [formControl]="searchControl"
+        class="search-input"
+      >
+    </div>
+
+    <div class="filter-buttons">
+      <button
+        *ngFor="let status of statusFilters"
+        (click)="filterByStatus(status.value)"
+        [class.active]="selectedStatus === status.value"
+        class="filter-btn"
+      >
+        {{ status.label }} ({{ getStatusCount(status.value) }})
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div [hidden]="!isLoading">
+    <app-loading-spinner message="Ładowanie aktywów..."></app-loading-spinner>
+  </div>
+
+  <!-- Content -->
+  <div class="content-area" [hidden]="isLoading">
+    <div class="assets-grid" *ngIf="assets.length > 0; else noAssets">
+      <div class="asset-card" *ngFor="let asset of assets">
+        <div class="asset-header">
+          <h3>{{ asset.name }}</h3>
+          <span
+            class="status-badge"
+            [ngClass]="'status-' + asset.status.toString().toLowerCase()"
+          >
+            {{ asset.status | assetStatus }}
+          </span>
+        </div>
+
+        <div class="asset-details">
+          <p><strong>S/N:</strong> {{ asset.serialNumber }}</p>
+          <p><strong>Kategoria:</strong> {{ asset.categoryName }}</p>
+          <p><strong>Lokalizacja:</strong> {{ asset.locationName || 'Brak' }}</p>
+          <p><strong>Wartość:</strong> {{ asset.purchasePrice | currency:'PLN':'symbol':'1.2-2' }}</p>
+        </div>
+
+        <div class="asset-actions">
+          <button
+            [routerLink]="['/assets', asset.id]"
+            class="btn btn-sm btn-outline"
+          >
+            Szczegóły
+          </button>
+          <button
+            *ngIf="canManage"
+            [routerLink]="['/assets/edit', asset.id]"
+            class="btn btn-sm btn-outline"
+          >
+            Edytuj
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="pagination" *ngIf="pagedResult.totalPages > 1">
+      <button
+        (click)="changePage(pagedResult.page - 1)"
+        [disabled]="!pagedResult.hasPreviousPage"
+        class="btn btn-sm"
+      >
+        Poprzednia
+      </button>
+
+      <span class="page-info">
+        Strona {{ pagedResult.page }} z {{ pagedResult.totalPages }}
+        ({{ pagedResult.totalCount }} aktywów)
+      </span>
+
+      <button
+        (click)="changePage(pagedResult.page + 1)"
+        [disabled]="!pagedResult.hasNextPage"
+        class="btn btn-sm"
+      >
+        Następna
+      </button>
+    </div>
+
+    <ng-template #noAssets>
+      <div class="empty-state">
+        <h3>Brak aktywów</h3>
+        <p>Nie znaleziono aktywów spełniających kryteria.</p>
+        <button
+          *ngIf="canManage"
+          routerLink="/assets/create"
+          class="btn btn-primary"
+        >
+          Dodaj pierwszy aktywo
+        </button>
+      </div>
+    </ng-template>
+  </div>
+</div>

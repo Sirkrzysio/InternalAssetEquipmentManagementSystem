@@ -1,0 +1,160 @@
+﻿﻿<div class="locations-container">
+  <header class="page-header">
+    <h1>Lokalizacje</h1>
+    <button
+      *ngIf="canManage"
+      (click)="showCreateForm = true"
+      class="btn btn-primary"
+    >
+      + Dodaj Lokalizację
+    </button>
+  </header>
+
+  <!-- Create/Edit Form Modal -->
+  <div class="modal-overlay" *ngIf="showCreateForm || editingLocation">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>{{ editingLocation ? 'Edytuj Lokalizację' : 'Nowa Lokalizacja' }}</h3>
+      </div>
+
+      <form [formGroup]="locationForm" (ngSubmit)="onSubmit()">
+        <div class="form-field">
+          <label for="name">Nazwa lokalizacji *</label>
+          <input
+            id="name"
+            type="text"
+            formControlName="name"
+            placeholder="np. Biuro Główne, Magazyn A1..."
+            [class.error]="nameErrors"
+          >
+          <span class="error-message" *ngIf="nameErrors">{{ nameErrors }}</span>
+        </div>
+
+        <div class="form-field">
+          <label for="address">Adres</label>
+          <textarea
+            id="address"
+            formControlName="address"
+            placeholder="Pełny adres lokalizacji..."
+            rows="3"
+          ></textarea>
+        </div>
+
+        <div class="form-field">
+          <label for="description">Opis</label>
+          <textarea
+            id="description"
+            formControlName="description"
+            placeholder="Dodatkowe informacje o lokalizacji..."
+            rows="2"
+          ></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" (click)="cancelForm()" class="btn btn-ghost">
+            Anuluj
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="locationForm.invalid || isSubmitting"
+          >
+            {{ isSubmitting ? 'Zapisywanie...' : (editingLocation ? 'Zapisz zmiany' : 'Dodaj lokalizację') }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Search Section -->
+  <div class="search-section">
+    <input
+      type="text"
+      placeholder="Szukaj lokalizacji..."
+      [formControl]="searchControl"
+      class="search-input"
+    >
+  </div>
+
+  <!-- Success Message -->
+  <div *ngIf="successMessage" class="success-banner">
+    {{ successMessage }}
+  </div>
+
+  <!-- Locations List -->
+  <!-- Loading State -->
+  <div [hidden]="!isLoading">
+    <app-loading-spinner message="Ładowanie lokalizacji..."></app-loading-spinner>
+  </div>
+
+  <!-- Content -->
+  <div [hidden]="isLoading">
+    <div class="locations-grid" *ngIf="filteredLocations.length > 0; else noLocations">
+      <div class="location-card" *ngFor="let location of filteredLocations">
+        <div class="location-header">
+          <h3 class="location-name">{{ location.name }}</h3>
+          <div class="location-stats">
+            <span class="assets-count">
+              {{ location.assetCount || 0 }} aktywów
+            </span>
+          </div>
+        </div>
+
+        <div class="location-address" *ngIf="location.address">
+          {{ location.address }}
+        </div>
+
+        <div class="location-details" *ngIf="location.description">
+          <div class="detail-item">
+            <span class="label">Opis:</span>
+            <span class="value">{{ location.description }}</span>
+          </div>
+        </div>
+
+        <div class="location-meta">
+          <div class="meta-dates">
+            <div>Utworzono: {{ location.createdAt | date:'dd.MM.yyyy' }}</div>
+            <div *ngIf="location.updatedAt">
+              Zaktualizowano: {{ location.updatedAt | date:'dd.MM.yyyy' }}
+            </div>
+          </div>
+
+          <div class="location-actions" *ngIf="canManage">
+            <button
+              (click)="editLocation(location)"
+              class="btn btn-sm btn-ghost"
+            >
+              Edytuj
+            </button>
+            <button
+              (click)="deleteLocation(location)"
+              class="btn btn-sm btn-danger"
+              [disabled]="deletingLocation === location.id"
+            >
+              {{ deletingLocation === location.id ? 'Usuwanie...' : 'Usuń' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #noLocations>
+      <div class="empty-state">
+        <h3>Brak lokalizacji</h3>
+        <p>Nie znaleziono lokalizacji spełniających kryteria wyszukiwania.</p>
+        <button
+          *ngIf="canManage"
+          (click)="showCreateForm = true"
+          class="btn btn-primary"
+        >
+          Dodaj pierwszą lokalizację
+        </button>
+      </div>
+    </ng-template>
+  </div>
+
+
+  <div *ngIf="errorMessage" class="error-banner">
+    {{ errorMessage }}
+  </div>
+</div>

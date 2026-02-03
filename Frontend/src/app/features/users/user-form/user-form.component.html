@@ -1,0 +1,130 @@
+﻿<div class="form-container">
+  <div class="form-header">
+    <h1>{{ isEditMode ? 'Edytuj Użytkownika' : 'Nowy Użytkownik' }}</h1>
+    <button routerLink="/users" class="btn btn-ghost">
+      ← Powrót do listy
+    </button>
+  </div>
+
+  <div *ngIf="isLoading" class="loading-container">
+    <app-loading-spinner message="Ładowanie danych użytkownika..."></app-loading-spinner>
+  </div>
+
+  <form [formGroup]="userForm" (ngSubmit)="onSubmit()" *ngIf="!isLoading" class="user-form">
+    <div class="form-grid">
+      <!-- Podstawowe informacje -->
+      <div class="form-section">
+        <h3>Informacje osobowe</h3>
+
+        <div class="form-row">
+          <div class="form-field">
+            <label for="firstName">Imię *</label>
+            <input
+              id="firstName"
+              type="text"
+              formControlName="firstName"
+              placeholder="Jan"
+              [class.error]="firstNameErrors"
+            >
+            <span class="error-message" *ngIf="firstNameErrors">{{ firstNameErrors }}</span>
+          </div>
+
+          <div class="form-field">
+            <label for="lastName">Nazwisko *</label>
+            <input
+              id="lastName"
+              type="text"
+              formControlName="lastName"
+              placeholder="Kowalski"
+              [class.error]="lastNameErrors"
+            >
+            <span class="error-message" *ngIf="lastNameErrors">{{ lastNameErrors }}</span>
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label for="email">Email *</label>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            placeholder="jan.kowalski@example.com"
+            [class.error]="emailErrors"
+          >
+          <span class="error-message" *ngIf="emailErrors">{{ emailErrors }}</span>
+        </div>
+
+        <div class="form-field" *ngIf="!isEditMode">
+          <label for="password">Hasło *</label>
+          <input
+            id="password"
+            type="password"
+            formControlName="password"
+            placeholder="Min. 6 znaków"
+            [class.error]="passwordErrors"
+          >
+          <span class="error-message" *ngIf="passwordErrors">{{ passwordErrors }}</span>
+          <small class="field-hint">Hasło powinno zawierać co najmniej 6 znaków</small>
+        </div>
+      </div>
+
+      <!-- Szczegóły kontaktowe -->
+      <div class="form-section">
+        <h3>Dane kontaktowe i organizacyjne</h3>
+
+        <div class="form-field">
+          <label for="phoneNumber">Telefon</label>
+          <input
+            id="phoneNumber"
+            type="tel"
+            formControlName="phoneNumber"
+            placeholder="+48 123 456 789"
+          >
+        </div>
+
+        <div class="form-field">
+          <label for="department">Dział</label>
+          <input
+            id="department"
+            type="text"
+            formControlName="department"
+            placeholder="IT, HR, Księgowość..."
+          >
+        </div>
+
+        <div class="form-field">
+          <label for="role">Rola *</label>
+          <select
+            id="role"
+            formControlName="role"
+            [class.error]="roleErrors"
+          >
+            <option value="">Wybierz rolę...</option>
+            <option [value]="UserRole.Employee">Pracownik</option>
+            <option [value]="UserRole.Manager">Menedżer</option>
+            <option [value]="UserRole.Admin">Administrator</option>
+          </select>
+          <span class="error-message" *ngIf="roleErrors">{{ roleErrors }}</span>
+          <small class="field-hint">Rola określa uprawnienia użytkownika w systemie</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" routerLink="/users" class="btn btn-ghost">
+        Anuluj
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="userForm.invalid || isSubmitting"
+      >
+        {{ isSubmitting ? 'Zapisywanie...' : (isEditMode ? 'Zapisz zmiany' : 'Dodaj użytkownika') }}
+      </button>
+    </div>
+  </form>
+
+  <div *ngIf="errorMessage" class="error-banner">
+    {{ errorMessage }}
+  </div>
+</div>

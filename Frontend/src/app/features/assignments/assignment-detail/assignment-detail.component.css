@@ -1,0 +1,16 @@
+﻿/* Assignment Detail Specific Styles */
+.actions-section {
+  text-align: center;
+}
+
+.action-description {
+  margin-bottom: 20px;
+  color: #666;
+  line-height: 1.5;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}

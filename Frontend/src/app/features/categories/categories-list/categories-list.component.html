@@ -1,0 +1,143 @@
+﻿<div class="categories-container">
+  <header class="page-header">
+    <h1>Kategorie Sprzętu</h1>
+    <button
+      *ngIf="canManage"
+      (click)="showCreateForm = true"
+      class="btn btn-primary"
+    >
+      + Dodaj Kategorię
+    </button>
+  </header>
+
+  <!-- Create/Edit Form Modal -->
+  <div class="modal-overlay" *ngIf="showCreateForm || editingCategory">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>{{ editingCategory ? 'Edytuj Kategorię' : 'Nowa Kategoria' }}</h3>
+      </div>
+
+      <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()">
+        <div class="form-field">
+          <label for="name">Nazwa kategorii *</label>
+          <input
+            id="name"
+            type="text"
+            formControlName="name"
+            placeholder="np. Laptopy, Drukarki..."
+            [class.error]="nameErrors"
+          >
+          <span class="error-message" *ngIf="nameErrors">{{ nameErrors }}</span>
+        </div>
+
+        <div class="form-field">
+          <label for="description">Opis</label>
+          <textarea
+            id="description"
+            formControlName="description"
+            placeholder="Dodatkowy opis kategorii..."
+            rows="3"
+          ></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" (click)="cancelForm()" class="btn btn-ghost">
+            Anuluj
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="categoryForm.invalid || isSubmitting"
+          >
+            {{ isSubmitting ? 'Zapisywanie...' : (editingCategory ? 'Zapisz zmiany' : 'Dodaj kategorię') }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Search Section -->
+  <div class="search-section">
+    <input
+      type="text"
+      placeholder="Szukaj kategorii..."
+      [formControl]="searchControl"
+      class="search-input"
+    >
+  </div>
+
+  <!-- Success Message -->
+  <div *ngIf="successMessage" class="success-banner">
+    {{ successMessage }}
+  </div>
+
+  <!-- Categories List -->
+  <!-- Loading State -->
+  <div [hidden]="!isLoading">
+    <app-loading-spinner message="Ładowanie kategorii..."></app-loading-spinner>
+  </div>
+
+  <!-- Content -->
+  <div [hidden]="isLoading">
+    <div class="categories-grid" *ngIf="filteredCategories.length > 0; else noCategories">
+      <div class="category-card" *ngFor="let category of filteredCategories">
+        <div class="category-header">
+          <h3 class="category-name">{{ category.name }}</h3>
+          <div class="category-stats">
+            <span class="assets-count">
+              {{ category.assetCount || 0 }} aktywów
+            </span>
+          </div>
+        </div>
+
+        <div class="category-description" *ngIf="category.description">
+          {{ category.description }}
+        </div>
+
+        <div class="category-meta">
+          <div class="meta-dates">
+            <div>Utworzono: {{ category.createdAt | date:'dd.MM.yyyy' }}</div>
+            <div *ngIf="category.updatedAt">
+              Zaktualizowano: {{ category.updatedAt | date:'dd.MM.yyyy' }}
+            </div>
+          </div>
+
+          <div class="category-actions" *ngIf="canManage">
+            <button
+              (click)="editCategory(category)"
+              class="btn btn-sm btn-ghost"
+            >
+              Edytuj
+            </button>
+            <button
+              (click)="deleteCategory(category)"
+              class="btn btn-sm btn-danger"
+              [disabled]="deletingCategory === category.id"
+            >
+              {{ deletingCategory === category.id ? 'Usuwanie...' : 'Usuń' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #noCategories>
+      <div class="empty-state">
+        <h3>Brak kategorii</h3>
+        <p>Nie znaleziono kategorii spełniających kryteria wyszukiwania.</p>
+        <button
+          *ngIf="canManage"
+          (click)="showCreateForm = true"
+          class="btn btn-primary"
+        >
+          Dodaj pierwszą kategorię
+        </button>
+      </div>
+    </ng-template>
+  </div>
+
+
+  <div *ngIf="errorMessage" class="error-banner">
+    {{ errorMessage }}
+  </div>
+</div>

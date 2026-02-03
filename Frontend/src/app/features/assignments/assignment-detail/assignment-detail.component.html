@@ -1,0 +1,127 @@
+﻿<div class="detail-container">
+  <div class="detail-header">
+    <div class="header-info">
+      <h1>{{ assignment?.assetName || 'Przypisanie' }}</h1>
+      <span
+        class="status-indicator"
+        [ngClass]="assignment.isActive ? 'active' : 'returned'"
+        *ngIf="assignment"
+      >
+        {{ assignment.isActive ? 'Aktywne' : 'Zakończone' }}
+      </span>
+    </div>
+    <div class="header-actions">
+      <button routerLink="/assignments" class="btn btn-ghost">
+        ← Powrót do listy
+      </button>
+      <button
+        *ngIf="canManage && assignment?.isActive"
+        (click)="returnAsset()"
+        class="btn btn-warning"
+        [disabled]="isReturning"
+      >
+        {{ isReturning ? 'Zwracanie...' : 'Zwróć sprzęt' }}
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="isLoading" class="loading-container">
+    <app-loading-spinner message="Ładowanie szczegółów przypisania..."></app-loading-spinner>
+  </div>
+
+  <div *ngIf="!isLoading && assignment" class="detail-content">
+    <!-- Informacje o sprzęcie -->
+    <div class="info-card">
+      <h2>Informacje o sprzęcie</h2>
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Nazwa sprzętu:</label>
+          <span>{{ assignment.assetName }}</span>
+        </div>
+        <div class="info-item">
+          <label>Numer seryjny:</label>
+          <span>{{ assignment.assetSerialNumber }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Informacje o użytkowniku -->
+    <div class="info-card">
+      <h2>Informacje o użytkowniku</h2>
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Imię i nazwisko:</label>
+          <span>{{ assignment.userFullName }}</span>
+        </div>
+        <div class="info-item">
+          <label>Email:</label>
+          <span>{{ assignment.userEmail }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Szczegóły przypisania -->
+    <div class="info-card">
+      <h2>Szczegóły przypisania</h2>
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Typ przypisania:</label>
+          <span class="assignment-type" [ngClass]="'type-' + assignment.type">
+            {{ assignment.type | assignmentType }}
+          </span>
+        </div>
+        <div class="info-item">
+          <label>Data przypisania:</label>
+          <span>{{ assignment.assignedAt | date:'dd.MM.yyyy HH:mm' }}</span>
+        </div>
+        <div class="info-item" *ngIf="assignment.expectedReturnDate && assignment.isActive">
+          <label>Oczekiwany zwrot:</label>
+          <span
+            [ngClass]="{'overdue': isOverdue(assignment.expectedReturnDate)}"
+          >
+            {{ assignment.expectedReturnDate | date:'dd.MM.yyyy' }}
+            <span *ngIf="isOverdue(assignment.expectedReturnDate)" class="overdue-label">
+              (Przeterminowane)
+            </span>
+          </span>
+        </div>
+        <div class="info-item" *ngIf="assignment.returnedAt">
+          <label>Data zwrotu:</label>
+          <span>{{ assignment.returnedAt | date:'dd.MM.yyyy HH:mm' }}</span>
+        </div>
+        <div class="info-item" *ngIf="assignment.notes">
+          <label>Uwagi:</label>
+          <span>{{ assignment.notes }}</span>
+        </div>
+        <div class="info-item">
+          <label>Data utworzenia:</label>
+          <span>{{ assignment.createdAt | date:'dd.MM.yyyy HH:mm' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status i akcje -->
+    <div class="info-card" *ngIf="assignment.isActive">
+      <h2>Akcje</h2>
+      <div class="actions-section">
+        <p class="action-description">
+          To przypisanie jest obecnie aktywne. Sprzęt znajduje się u użytkownika
+          <strong>{{ assignment.userFullName }}</strong>.
+        </p>
+        <div class="action-buttons" *ngIf="canManage">
+          <button
+            (click)="returnAsset()"
+            class="btn btn-warning"
+            [disabled]="isReturning"
+          >
+            {{ isReturning ? 'Zwracanie...' : 'Zwróć sprzęt' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="errorMessage" class="error-banner">
+    {{ errorMessage }}
+  </div>
+</div>
