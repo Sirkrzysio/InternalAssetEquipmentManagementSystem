@@ -17,7 +17,7 @@ System umożliwia kompleksowe zarządzanie majątkiem firmy z pełną kontrolą 
 
 ## 🏗️ Architektura Systemu
 
-### Backend (.NET 8 - Clean Architecture)
+### Backend (.NET 10 - Clean Architecture)
 ```
 Backend/
 ├── AssetManagement.API/           # Warstwa Prezentacji
@@ -42,7 +42,7 @@ Backend/
     └── Migrations/                # Migracje bazy danych
 ```
 
-### Frontend (Angular 17+ - Enterprise Structure)
+### Frontend (Angular 21 - Enterprise Structure)
 ```
 Frontend/src/app/
 ├── core/                          # Warstwa Core (singletons)
@@ -70,8 +70,8 @@ Frontend/src/app/
 ## 🚀 Uruchomienie Systemu
 
 ### Wymagania
-- **.NET 8 SDK** 
-- **Node.js 18+**  
+- **.NET SDK 10.0.100** 
+- **Node.js 20+**  
 - **PostgreSQL**
 
 ### Krok 1: Baza Danych
@@ -189,7 +189,7 @@ export const environment = {
 ## 📈 Technologie
 
 ### Backend
-- **.NET 8** - najnowsza wersja platformy
+- **.NET 10** - platforma backendowa zgodna z `Backend/global.json`
 - **Entity Framework Core** - ORM z Code First
 - **PostgreSQL** - relacyjna baza danych
 - **JWT Bearer** - autoryzacja
@@ -197,11 +197,26 @@ export const environment = {
 - **FluentValidation** - walidacja
 
 ### Frontend  
-- **Angular 17+** - najnowsza wersja z standalone components
+- **Angular 21.x** - standalone components i lazy-loaded routes
 - **TypeScript** - silne typowanie  
 - **RxJS** - reaktywne programowanie
 - **Angular Material inspire** - komponenty UI
 - **Lazy Loading** - optymalizacja wydajności
+
+## 📚 Dokumentacja Techniczna
+
+Dokumentacja dla dalszego rozwoju i pracy z AI znajduje się w `docs/ai`:
+
+- `project-overview.md` - architektura i główne założenia systemu
+- `engineering-standards.md` - standardy seniorskiej pracy, enterprise i zasady anty-AI-slop
+- `api-map.md` - endpointy, autoryzacja i mapowanie controller/service
+- `backend-implementation-notes.md` - aktualny stan backendu, realne zachowania i znane ryzyka
+- `frontend-map.md` - struktura Angulara, routing, serwisy i modele
+- `frontend-implementation-notes.md` - aktualny stan frontendu, realne integracje i znane luki
+- `frontend-development-guide.md` - praktyczne zasady rozwoju frontendu
+- `deployment-config-notes.md` - konfiguracja środowisk, sekrety, baza, CORS i JWT
+- `decision-log.md` - zapis decyzji architektonicznych i ich konsekwencji
+- `maintenance-notes.md` - ryzyka, niespójności i priorytety utrzymaniowe
 
 ## 📋 API Endpoints
 
