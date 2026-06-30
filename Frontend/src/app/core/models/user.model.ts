@@ -37,6 +37,7 @@ export interface CreateUserRequest {
  * Update User Request
  */
 export interface UpdateUserRequest {
+  email: string;
   firstName: string;
   lastName: string;
   department?: string;
