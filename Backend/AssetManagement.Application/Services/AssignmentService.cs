@@ -53,9 +53,9 @@ public class AssignmentService : IAssignmentService
         return Result<PagedResult<AssignmentDto>>.Success(PagedResult<AssignmentDto>.Create(dtos, totalCount, page, pageSize));
     }
 
-    public async Task<Result<PagedResult<AssignmentDto>>> GetPagedAsync(int page, int pageSize, string? searchTerm)
+    public async Task<Result<PagedResult<AssignmentDto>>> GetPagedAsync(int page, int pageSize, string? searchTerm, bool? isActive = null)
     {
-        var (items, totalCount) = await _unitOfWork.Assignments.GetPagedAsync(page, pageSize, searchTerm);
+        var (items, totalCount) = await _unitOfWork.Assignments.GetPagedAsync(page, pageSize, searchTerm, isActive);
         var dtos = _mapper.Map<IEnumerable<AssignmentDto>>(items);
         return Result<PagedResult<AssignmentDto>>.Success(PagedResult<AssignmentDto>.Create(dtos, totalCount, page, pageSize));
     }

@@ -1,115 +1,157 @@
 ﻿<div class="assets-container">
   <header class="page-header">
-    <h1>Zarządzanie Aktywami</h1>
-    <button
+    <div>
+      <p class="page-eyebrow">Ewidencja wyposażenia</p>
+      <h1>Aktywa</h1>
+      <p class="page-description">Przeglądaj sprzęt, jego dostępność i bieżącą lokalizację.</p>
+    </div>
+    <a
       *ngIf="canManage"
       routerLink="/assets/create"
       class="btn btn-primary"
     >
-      + Dodaj Aktywo
-    </button>
+      <span aria-hidden="true">+</span>
+      Dodaj aktywo
+    </a>
   </header>
 
-  <div class="filters-section">
+  <section class="filters-section" aria-label="Filtrowanie aktywów">
     <div class="search-box">
+      <label for="asset-search">Wyszukaj aktywo</label>
       <input
+        id="asset-search"
         type="text"
-        placeholder="Szukaj aktywów..."
+        placeholder="Nazwa lub numer seryjny"
         [formControl]="searchControl"
         class="search-input"
       >
     </div>
 
-    <div class="filter-buttons">
+    <div class="filter-group">
+      <span class="filter-label">Status</span>
+      <div class="filter-buttons">
       <button
         *ngFor="let status of statusFilters"
+        type="button"
         (click)="filterByStatus(status.value)"
         [class.active]="selectedStatus === status.value"
+        [attr.aria-pressed]="selectedStatus === status.value"
         class="filter-btn"
       >
-        {{ status.label }} ({{ getStatusCount(status.value) }})
+        {{ status.label }}
       </button>
+      </div>
     </div>
-  </div>
+  </section>
 
-  <!-- Loading State -->
-  <div [hidden]="!isLoading">
+  <div *ngIf="isLoading" class="state-panel" aria-live="polite">
     <app-loading-spinner message="Ładowanie aktywów..."></app-loading-spinner>
   </div>
 
-  <!-- Content -->
-  <div class="content-area" [hidden]="isLoading">
-    <div class="assets-grid" *ngIf="assets.length > 0; else noAssets">
-      <div class="asset-card" *ngFor="let asset of assets">
-        <div class="asset-header">
-          <h3>{{ asset.name }}</h3>
-          <span
-            class="status-badge"
-            [ngClass]="'status-' + asset.status.toString().toLowerCase()"
-          >
-            {{ asset.status | assetStatus }}
-          </span>
-        </div>
+  <div *ngIf="!isLoading && errorMessage" class="error-state" role="alert">
+    <div>
+      <strong>Nie udało się załadować listy</strong>
+      <p>{{ errorMessage }}</p>
+    </div>
+    <button type="button" class="btn btn-outline" (click)="loadAssets()">Ponów</button>
+  </div>
 
-        <div class="asset-details">
-          <p><strong>S/N:</strong> {{ asset.serialNumber }}</p>
-          <p><strong>Kategoria:</strong> {{ asset.categoryName }}</p>
-          <p><strong>Lokalizacja:</strong> {{ asset.locationName || 'Brak' }}</p>
-          <p><strong>Wartość:</strong> {{ asset.purchasePrice | currency:'PLN':'symbol':'1.2-2' }}</p>
-        </div>
+  <div class="content-area" *ngIf="!isLoading && !errorMessage">
+    <div class="assets-table-shell" *ngIf="assets.length > 0; else noAssets">
+      <div class="table-summary">
+        <span>Wyniki</span>
+        <strong>{{ pagedResult.totalCount }}</strong>
+      </div>
 
-        <div class="asset-actions">
-          <button
-            [routerLink]="['/assets', asset.id]"
-            class="btn btn-sm btn-outline"
-          >
-            Szczegóły
-          </button>
-          <button
-            *ngIf="canManage"
-            [routerLink]="['/assets/edit', asset.id]"
-            class="btn btn-sm btn-outline"
-          >
-            Edytuj
-          </button>
-        </div>
+      <div class="assets-table-scroll">
+        <table class="assets-table">
+          <caption class="visually-hidden">Lista aktywów wraz ze statusem, lokalizacją i akcjami</caption>
+          <thead>
+            <tr>
+              <th scope="col">Aktywo</th>
+              <th scope="col">Kategoria</th>
+              <th scope="col">Lokalizacja</th>
+              <th scope="col">Wartość</th>
+              <th scope="col">Status</th>
+              <th scope="col" class="actions-heading">Akcje</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let asset of assets">
+              <td class="asset-identity">
+                <a [routerLink]="['/assets', asset.id]" class="asset-name">{{ asset.name }}</a>
+                <span class="asset-serial">S/N {{ asset.serialNumber }}</span>
+              </td>
+              <td data-label="Kategoria">{{ asset.categoryName }}</td>
+              <td data-label="Lokalizacja">{{ asset.locationName || 'Nieprzypisana' }}</td>
+              <td data-label="Wartość" class="numeric-value">
+                {{ asset.purchasePrice | currency:'PLN':'symbol':'1.2-2' }}
+              </td>
+              <td data-label="Status">
+                <span class="status-badge" [ngClass]="getStatusClass(asset.status)">
+                  <span class="status-dot" aria-hidden="true"></span>
+                  {{ asset.status | assetStatus }}
+                </span>
+              </td>
+              <td class="asset-actions">
+                <a [routerLink]="['/assets', asset.id]" class="btn btn-sm btn-outline">Szczegóły</a>
+                <a
+                  *ngIf="canManage"
+                  [routerLink]="['/assets/edit', asset.id]"
+                  class="btn btn-sm btn-ghost"
+                >
+                  Edytuj
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
-    <div class="pagination" *ngIf="pagedResult.totalPages > 1">
+    <nav class="pagination" *ngIf="pagedResult.totalPages > 1" aria-label="Stronicowanie aktywów">
       <button
+        type="button"
         (click)="changePage(pagedResult.page - 1)"
         [disabled]="!pagedResult.hasPreviousPage"
+        [attr.aria-label]="'Przejdź do strony ' + (pagedResult.page - 1)"
         class="btn btn-sm"
       >
         Poprzednia
       </button>
 
-      <span class="page-info">
+      <span class="page-info" aria-live="polite">
         Strona {{ pagedResult.page }} z {{ pagedResult.totalPages }}
         ({{ pagedResult.totalCount }} aktywów)
       </span>
 
       <button
+        type="button"
         (click)="changePage(pagedResult.page + 1)"
         [disabled]="!pagedResult.hasNextPage"
+        [attr.aria-label]="'Przejdź do strony ' + (pagedResult.page + 1)"
         class="btn btn-sm"
       >
         Następna
       </button>
-    </div>
+    </nav>
 
     <ng-template #noAssets>
       <div class="empty-state">
-        <h3>Brak aktywów</h3>
-        <p>Nie znaleziono aktywów spełniających kryteria.</p>
-        <button
-          *ngIf="canManage"
+        <span class="empty-mark" aria-hidden="true"></span>
+        <h3>{{ hasActiveFilters ? 'Brak pasujących aktywów' : 'Ewidencja jest pusta' }}</h3>
+        <p>
+          {{ hasActiveFilters
+            ? 'Zmień wyszukiwaną frazę lub wybierz inny status.'
+            : 'Dodaj pierwsze aktywo, aby rozpocząć ewidencję wyposażenia.' }}
+        </p>
+        <a
+          *ngIf="canManage && !hasActiveFilters"
           routerLink="/assets/create"
           class="btn btn-primary"
         >
-          Dodaj pierwszy aktywo
-        </button>
+          Dodaj pierwsze aktywo
+        </a>
       </div>
     </ng-template>
   </div>

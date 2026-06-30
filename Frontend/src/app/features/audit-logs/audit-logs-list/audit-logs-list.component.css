@@ -12,3 +12,226 @@
 .filter-row:last-child .filter-actions {
   align-self: end;
 }
+
+:host {
+  display: block;
+}
+
+.audit-logs-container {
+  width: min(100%, var(--content-width));
+  margin: 0 auto;
+  padding: 34px 28px 48px;
+}
+
+.page-header {
+  margin-bottom: 22px;
+  padding: 0;
+  border: 0;
+}
+
+.header-content {
+  width: 100%;
+  align-items: flex-end;
+}
+
+.page-header h1 {
+  margin: 0;
+  color: var(--color-ink);
+  font-size: clamp(1.75rem, 2.5vw, 2.25rem);
+  letter-spacing: -0.04em;
+}
+
+.page-eyebrow {
+  margin: 0 0 7px;
+  color: var(--color-primary);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.page-description {
+  margin: 8px 0 0;
+  color: var(--color-ink-muted);
+}
+
+.admin-badge {
+  color: var(--color-warning);
+  border: 1px solid #efd39d;
+  background: var(--color-warning-soft);
+  font-size: 10px;
+  text-transform: none;
+}
+
+.filters-section {
+  margin-bottom: 16px;
+  padding: 17px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: rgb(255 255 255 / 86%);
+  box-shadow: var(--shadow-sm);
+}
+
+.filter-field label {
+  color: var(--color-ink-muted);
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.filter-field input,
+.filter-field select {
+  min-height: 40px;
+  border-color: var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+}
+
+.filter-field input:focus,
+.filter-field select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgb(8 126 139 / 12%);
+}
+
+.audit-logs-list {
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.audit-log-card {
+  position: relative;
+  margin: 0;
+  padding: 17px 18px 17px 30px;
+  border: 0;
+  border-bottom: 1px solid var(--color-border);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  transition: background-color var(--transition-fast);
+}
+
+.audit-log-card::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  position: absolute;
+  left: 14px;
+  top: 23px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  box-shadow: 0 0 0 4px var(--color-primary-soft);
+}
+
+.audit-log-card:last-child {
+  border-bottom: 0;
+}
+
+.audit-log-card:hover {
+  background: #f8fbfc;
+  box-shadow: none;
+  transform: none;
+}
+
+.audit-log-header {
+  margin-bottom: 12px;
+}
+
+.action-badge,
+.entity-badge {
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: none;
+}
+
+.audit-timestamp {
+  color: var(--color-ink-subtle);
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.audit-info {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.audit-info-item {
+  padding: 0;
+  border: 0;
+}
+
+.audit-info-item label {
+  color: var(--color-ink-subtle);
+  font-size: 9px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.audit-info-item span {
+  color: var(--color-ink);
+  font-size: 11px;
+}
+
+.audit-changes {
+  margin-top: 13px;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-subtle);
+}
+
+.audit-changes h5 {
+  color: var(--color-ink-muted);
+  font-size: 10px;
+}
+
+.changes-json {
+  color: #38515e;
+  font-size: 11px;
+}
+
+.pagination,
+.empty-state,
+.error-banner {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.error-banner {
+  color: var(--color-danger);
+  border-color: #efc2c8;
+  background: var(--color-danger-soft);
+}
+
+@media (max-width: 720px) {
+  .audit-logs-container {
+    padding: 24px 16px 40px;
+  }
+
+  .header-content,
+  .audit-log-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .audit-info {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-actions {
+    width: 100%;
+  }
+
+  .filter-actions .btn {
+    flex: 1;
+  }
+}

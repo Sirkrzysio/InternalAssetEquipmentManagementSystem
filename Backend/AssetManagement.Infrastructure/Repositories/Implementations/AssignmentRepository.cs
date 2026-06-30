@@ -95,12 +95,19 @@ public class AssignmentRepository : IAssignmentRepository
         return (items, totalCount);
     }
 
-    public async Task<(IEnumerable<Assignment> Items, int TotalCount)> GetPagedAsync(int page, int pageSize, string? searchTerm)
+    public async Task<(IEnumerable<Assignment> Items, int TotalCount)> GetPagedAsync(int page, int pageSize, string? searchTerm, bool? isActive = null)
     {
         var query = _context.Assignments
             .Include(a => a.Asset)
             .Include(a => a.User)
             .AsQueryable();
+
+        if (isActive.HasValue)
+        {
+            query = isActive.Value
+                ? query.Where(a => a.ReturnedAt == null)
+                : query.Where(a => a.ReturnedAt != null);
+        }
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {

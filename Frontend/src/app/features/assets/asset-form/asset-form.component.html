@@ -117,4 +117,16 @@
   </ng-template>
 
   <div *ngIf="errorMessage" class="error-banner">{{ errorMessage }}</div>
+
+  <app-confirm-dialog
+    [isOpen]="showDeleteConfirm"
+    title="Usuń aktywo"
+    message="Czy na pewno chcesz usunąć to aktywo?"
+    type="danger"
+    confirmText="Usuń"
+    processingText="Usuwanie..."
+    [isProcessing]="isSubmitting"
+    (confirm)="confirmDelete()"
+    (cancel)="cancelDelete()"
+  ></app-confirm-dialog>
 </div>

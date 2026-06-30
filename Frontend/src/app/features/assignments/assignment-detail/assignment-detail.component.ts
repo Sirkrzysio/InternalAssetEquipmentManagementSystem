@@ -6,6 +6,7 @@ import { switchMap } from 'rxjs/operators';
 import { AssignmentService } from '../../../core/services/assignment.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Assignment } from '../../../core/models';
+import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 import { AssignmentTypePipe } from '../../../shared/pipes/assignment-type.pipe';
 
@@ -15,11 +16,16 @@ import { AssignmentTypePipe } from '../../../shared/pipes/assignment-type.pipe';
   imports: [
     CommonModule,
     RouterModule,
+    ConfirmDialogComponent,
     LoadingSpinnerComponent,
     AssignmentTypePipe
   ],
   templateUrl: './assignment-detail.component.html',
-  styleUrls: ['../assignments-shared.styles.css', './assignment-detail.component.css']
+  styleUrls: [
+    '../assignments-shared.styles.css',
+    './assignment-detail.component.css',
+    '../../../shared/styles/enterprise-detail.css'
+  ]
 })
 export class AssignmentDetailComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
@@ -30,6 +36,7 @@ export class AssignmentDetailComponent implements OnInit {
   assignment: Assignment | null = null;
   isLoading = true;
   isReturning = false;
+  showReturnConfirm = false;
   errorMessage = '';
 
   get canManage(): boolean {
@@ -62,13 +69,13 @@ export class AssignmentDetailComponent implements OnInit {
 
   returnAsset(): void {
     if (!this.canManage || !this.assignment?.isActive) return;
+    this.showReturnConfirm = true;
+  }
 
-    const confirmed = confirm(
-      `Czy na pewno chcesz zwrócić sprzęt "${this.assignment.assetName}" od użytkownika ${this.assignment.userFullName}?`
-    );
+  confirmReturnAsset(): void {
+    if (!this.assignment) return;
 
-    if (!confirmed) return;
-
+    this.showReturnConfirm = false;
     this.isReturning = true;
 
     this.assignmentService.returnAsset(this.assignment.id).subscribe({
@@ -83,6 +90,10 @@ export class AssignmentDetailComponent implements OnInit {
         this.isReturning = false;
       }
     });
+  }
+
+  cancelReturnAsset(): void {
+    this.showReturnConfirm = false;
   }
 
   isOverdue(expectedReturnDate: string): boolean {

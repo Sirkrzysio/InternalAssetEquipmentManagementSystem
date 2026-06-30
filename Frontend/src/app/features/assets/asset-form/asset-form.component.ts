@@ -1,14 +1,16 @@
-﻿import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { forkJoin, of } from 'rxjs';
 
 import { AssetService } from '../../../core/services/asset.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { CategoryService } from '../../../core/services/category.service';
+import { LocationService } from '../../../core/services/location.service';
 import { Asset, AssetStatus, Category, Location } from '../../../core/models';
+import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-asset-form',
@@ -17,16 +19,23 @@ import { ReactiveFormsModule } from '@angular/forms';
     CommonModule,
     ReactiveFormsModule,
     RouterModule,
+    ConfirmDialogComponent,
     LoadingSpinnerComponent
   ],
   templateUrl: './asset-form.component.html',
-  styleUrls: ['../assets-shared.styles.css', './asset-form.component.css']
+  styleUrls: [
+    '../assets-shared.styles.css',
+    './asset-form.component.css',
+    '../../../shared/styles/enterprise-form.css'
+  ]
 })
 export class AssetFormComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private assetService = inject(AssetService);
   private authService = inject(AuthService);
+  private categoryService = inject(CategoryService);
+  private locationService = inject(LocationService);
   private fb = inject(FormBuilder);
   private cdr = inject(ChangeDetectorRef);
 
@@ -34,6 +43,7 @@ export class AssetFormComponent implements OnInit {
   isEditMode = false;
   isLoading = true;
   isSubmitting = false;
+  showDeleteConfirm = false;
   errorMessage = '';
   AssetStatus = AssetStatus;
 
@@ -49,12 +59,7 @@ export class AssetFormComponent implements OnInit {
     this.isEditMode = !!this.assetId;
 
     this.buildForm();
-
-    if (this.isEditMode && this.assetId) {
-      this.loadAsset(this.assetId);
-    } else {
-      this.isLoading = false;
-    }
+    this.loadFormData();
   }
 
   private buildForm(): void {
@@ -73,20 +78,41 @@ export class AssetFormComponent implements OnInit {
     });
   }
 
-  private loadAsset(id: string): void {
+  private loadFormData(): void {
     this.isLoading = true;
-    this.assetService.getById(id).subscribe({
-      next: (asset: Asset) => {
-        this.assetForm.patchValue(asset);
+    this.errorMessage = '';
+
+    forkJoin({
+      categories: this.categoryService.getAll(),
+      locations: this.locationService.getAll(),
+      asset: this.isEditMode && this.assetId ? this.assetService.getById(this.assetId) : of(undefined)
+    }).subscribe({
+      next: ({ categories, locations, asset }) => {
+        this.categories = categories;
+        this.locations = locations;
+
+        if (asset) {
+          this.assetForm.patchValue({
+            ...asset,
+            purchaseDate: this.toDateInputValue(asset.purchaseDate),
+            warrantyExpiration: this.toDateInputValue(asset.warrantyExpiration)
+          });
+        }
+
         this.isLoading = false;
-        this.cdr.detectChanges(); // gwarantuje, że formularz się odświeży
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error(err);
-        this.errorMessage = 'Nie udało się załadować danych aktywa';
+        this.errorMessage = 'Nie udało się załadować danych formularza';
         this.isLoading = false;
       }
     });
+  }
+
+  private toDateInputValue(value?: string | Date | null): string {
+    if (!value) return '';
+    return new Date(value).toISOString().split('T')[0];
   }
 
   get nameErrors() {
@@ -142,9 +168,14 @@ export class AssetFormComponent implements OnInit {
   }
 
   onDelete(): void {
-    if (!confirm('Czy na pewno chcesz usunąć to aktywo?')) return;
+    if (!this.assetId) return;
+    this.showDeleteConfirm = true;
+  }
+
+  confirmDelete(): void {
     if (!this.assetId) return;
 
+    this.showDeleteConfirm = false;
     this.isSubmitting = true;
     this.assetService.delete(this.assetId).subscribe({
       next: () => this.router.navigate(['/assets']),
@@ -154,5 +185,9 @@ export class AssetFormComponent implements OnInit {
         this.isSubmitting = false;
       }
     });
+  }
+
+  cancelDelete(): void {
+    this.showDeleteConfirm = false;
   }
 }

@@ -2,7 +2,7 @@
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { debounceTime, distinctUntilChanged, startWith } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 import { AssetService } from '../../../core/services/asset.service';
 import { AuthService } from '../../../core/services/auth.service';
@@ -40,6 +40,7 @@ export class AssetsListComponent implements OnInit {
   };
 
   isLoading = false;
+  errorMessage = '';
   selectedStatus: AssetStatus | 'all' = 'all';
 
   searchControl = new FormControl('');
@@ -55,6 +56,10 @@ export class AssetsListComponent implements OnInit {
 
   get canManage(): boolean {
     return this.authService.hasAnyRole(['Admin', 'Manager']);
+  }
+
+  get hasActiveFilters(): boolean {
+    return this.selectedStatus !== 'all' || Boolean(this.searchControl.value?.trim());
   }
 
   ngOnInit(): void {
@@ -76,22 +81,25 @@ export class AssetsListComponent implements OnInit {
 
   loadAssets(): void {
     this.isLoading = true;
+    this.errorMessage = '';
 
     const request = {
       page: this.pagedResult.page,
       pageSize: this.pagedResult.pageSize,
-      searchTerm: this.searchControl.value || undefined
+      searchTerm: this.searchControl.value || undefined,
+      status: this.selectedStatus === 'all' ? undefined : this.selectedStatus
     };
 
     this.assetService.getPaged(request).subscribe({
       next: (result) => {
         this.pagedResult = result;
-        this.assets = this.filterAssetsByStatus(result.items);
+        this.assets = result.items;
         this.isLoading = false;
         this.cdr.detectChanges();
       },
       error: (error) => {
         console.error('Error loading assets:', error);
+        this.errorMessage = 'Nie udało się pobrać aktywów. Spróbuj ponownie.';
         this.assets = [];
         this.pagedResult = {
           items: [],
@@ -110,21 +118,8 @@ export class AssetsListComponent implements OnInit {
 
   filterByStatus(status: AssetStatus | 'all'): void {
     this.selectedStatus = status;
-    this.assets = this.filterAssetsByStatus(this.pagedResult.items);
-  }
-
-  private filterAssetsByStatus(assets: Asset[]): Asset[] {
-    if (this.selectedStatus === 'all') {
-      return assets;
-    }
-    return assets.filter(asset => asset.status === this.selectedStatus);
-  }
-
-  getStatusCount(status: AssetStatus | 'all'): number {
-    if (status === 'all') {
-      return this.pagedResult.items.length;
-    }
-    return this.pagedResult.items.filter(asset => asset.status === status).length;
+    this.pagedResult.page = 1;
+    this.loadAssets();
   }
 
   changePage(page: number): void {
@@ -132,5 +127,9 @@ export class AssetsListComponent implements OnInit {
       this.pagedResult.page = page;
       this.loadAssets();
     }
+  }
+
+  getStatusClass(status: AssetStatus): string {
+    return `status-${AssetStatus[status].toLowerCase()}`;
   }
 }

@@ -33,9 +33,9 @@ public class AssetService : IAssetService
         return Result<IEnumerable<AssetDto>>.Success(_mapper.Map<IEnumerable<AssetDto>>(assets));
     }
 
-    public async Task<Result<PagedResult<AssetDto>>> GetPagedAsync(int page, int pageSize, string? searchTerm = null)
+    public async Task<Result<PagedResult<AssetDto>>> GetPagedAsync(int page, int pageSize, string? searchTerm = null, AssetManagement.Domain.Enums.AssetStatus? status = null)
     {
-        var (items, totalCount) = await _unitOfWork.Assets.GetPagedAsync(page, pageSize, searchTerm);
+        var (items, totalCount) = await _unitOfWork.Assets.GetPagedAsync(page, pageSize, searchTerm, status);
         var dtos = _mapper.Map<IEnumerable<AssetDto>>(items);
         return Result<PagedResult<AssetDto>>.Success(PagedResult<AssetDto>.Create(dtos, totalCount, page, pageSize));
     }

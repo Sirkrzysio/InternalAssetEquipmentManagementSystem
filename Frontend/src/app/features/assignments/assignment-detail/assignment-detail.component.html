@@ -124,4 +124,16 @@
   <div *ngIf="errorMessage" class="error-banner">
     {{ errorMessage }}
   </div>
+
+  <app-confirm-dialog
+    [isOpen]="showReturnConfirm"
+    title="Zwróć sprzęt"
+    [message]="'Czy na pewno chcesz zwrócić sprzęt &quot;' + (assignment?.assetName || '') + '&quot; od użytkownika ' + (assignment?.userFullName || '') + '?'"
+    type="warning"
+    confirmText="Zwróć"
+    processingText="Zwracanie..."
+    [isProcessing]="isReturning"
+    (confirm)="confirmReturnAsset()"
+    (cancel)="cancelReturnAsset()"
+  ></app-confirm-dialog>
 </div>

@@ -24,7 +24,11 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
     LoadingSpinnerComponent
   ],
   templateUrl: './asset-detail.component.html',
-  styleUrls: ['../assets-shared.styles.css', './asset-detail.component.css']
+  styleUrls: [
+    '../assets-shared.styles.css',
+    './asset-detail.component.css',
+    '../../../shared/styles/enterprise-detail.css'
+  ]
 })
 export class AssetDetailComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);

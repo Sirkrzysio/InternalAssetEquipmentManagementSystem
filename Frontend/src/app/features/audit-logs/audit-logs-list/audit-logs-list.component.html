@@ -1,8 +1,12 @@
 ﻿<div class="audit-logs-container">
   <header class="page-header">
     <div class="header-content">
-      <h1>Logi Audytu</h1>
-      <span class="admin-badge">Tylko dla Administratorów</span>
+      <div>
+        <p class="page-eyebrow">Ślad operacyjny</p>
+        <h1>Logi audytu</h1>
+        <p class="page-description">Przeglądaj działania użytkowników i zmiany w danych systemu.</p>
+      </div>
+      <span class="admin-badge">Dostęp administratora</span>
     </div>
   </header>
 
@@ -27,7 +31,10 @@
           <option value="Create">Utworzenie</option>
           <option value="Update">Aktualizacja</option>
           <option value="Delete">Usunięcie</option>
-          <option value="Restore">Przywrócenie</option>
+          <option value="Assign">Przypisanie</option>
+          <option value="Unassign">Odpięcie</option>
+          <option value="Login">Logowanie</option>
+          <option value="Logout">Wylogowanie</option>
         </select>
       </div>
 
@@ -54,12 +61,12 @@
       </div>
 
       <div class="filter-field">
-        <label for="userEmail">Email użytkownika</label>
+        <label for="userEmail">Szukaj w logach</label>
         <input
-          type="email"
+          type="search"
           [formControl]="userEmailFilter"
           id="userEmail"
-          placeholder="Szukaj po email..."
+          placeholder="Użytkownik, IP, encja lub akcja..."
         >
       </div>
 
@@ -75,12 +82,12 @@
   </div>
 
   <!-- Loading State -->
-  <div [hidden]="!isLoading">
+  <div *ngIf="isLoading">
     <app-loading-spinner message="Ładowanie logów audytu..."></app-loading-spinner>
   </div>
 
   <!-- Content -->
-  <div [hidden]="isLoading">
+  <div *ngIf="!isLoading && !errorMessage">
     <div class="audit-logs-list" *ngIf="auditLogs.length > 0; else noLogs">
       <div class="audit-log-card" *ngFor="let log of auditLogs">
         <div class="audit-log-header">
@@ -153,7 +160,7 @@
   </div>
 
 
-  <div *ngIf="errorMessage" class="error-banner">
+  <div *ngIf="errorMessage" class="error-banner" role="alert">
     {{ errorMessage }}
   </div>
 </div>

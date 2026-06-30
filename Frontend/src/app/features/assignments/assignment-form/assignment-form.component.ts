@@ -2,11 +2,12 @@
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { forkJoin } from 'rxjs';
 
 import { AssignmentService } from '../../../core/services/assignment.service';
 import { AssetService } from '../../../core/services/asset.service';
 import { UserService } from '../../../core/services/user.service';
-import { Asset, User, AssignmentType } from '../../../core/models';
+import { Asset, AssetStatus, User, AssignmentType } from '../../../core/models';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 
 @Component({
@@ -19,7 +20,11 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
     LoadingSpinnerComponent
   ],
   templateUrl: './assignment-form.component.html',
-  styleUrls: ['../assignments-shared.styles.css', './assignment-form.component.css']
+  styleUrls: [
+    '../assignments-shared.styles.css',
+    './assignment-form.component.css',
+    '../../../shared/styles/enterprise-form.css'
+  ]
 })
 export class AssignmentFormComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
@@ -84,20 +89,21 @@ export class AssignmentFormComponent implements OnInit {
   private loadFormData(): void {
     this.isLoading = true;
 
-    // Load both assets and users in parallel
-    Promise.all([
-      this.assetService.getAll().toPromise(),
-      this.userService.getAll().toPromise()
-    ]).then(([assets, users]) => {
-      // Filter only available assets
-      this.availableAssets = (assets || []).filter(asset => asset.status === 0); // Available status
-      this.users = users || [];
-      this.isLoading = false;
-      this.cdr.detectChanges();
-    }).catch((error) => {
-      console.error('Error loading form data:', error);
-      this.errorMessage = 'Nie udało się załadować danych formularza';
-      this.isLoading = false;
+    forkJoin({
+      assets: this.assetService.getAll(),
+      users: this.userService.getAll()
+    }).subscribe({
+      next: ({ assets, users }) => {
+        this.availableAssets = assets.filter(asset => asset.status === AssetStatus.Available);
+        this.users = users;
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('Error loading form data:', error);
+        this.errorMessage = 'Nie udało się załadować danych formularza';
+        this.isLoading = false;
+      }
     });
   }
 

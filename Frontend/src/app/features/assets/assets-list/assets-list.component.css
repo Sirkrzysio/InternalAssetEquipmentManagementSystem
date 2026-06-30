@@ -1,69 +1,277 @@
-﻿/* Assets List Specific Styles */
-.assets-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 20px;
+﻿/* Operational list layout */
+.assets-table-shell {
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
 }
 
-.asset-card {
-  background: white;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  transition: transform 0.2s;
-}
-
-.asset-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-.asset-header {
+.table-summary {
+  min-height: 45px;
+  padding: 0 16px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
+  gap: 7px;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-ink-muted);
+  font-size: 12px;
 }
 
-.asset-header h3 {
-  margin: 0;
-  font-size: 18px;
-  color: #333;
+.table-summary strong {
+  min-width: 26px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  color: var(--color-primary-hover);
+  background: var(--color-primary-soft);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
 }
 
-.asset-details {
-  margin-bottom: 20px;
+.assets-table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
-.asset-details p {
-  margin: 8px 0;
-  font-size: 14px;
-  color: #555;
+.assets-table {
+  width: 100%;
+  min-width: 920px;
+  border-collapse: collapse;
+  color: var(--color-ink);
+  font-size: 13px;
+}
+
+.assets-table th {
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--color-border-strong);
+  color: var(--color-ink-muted);
+  background: var(--color-surface-subtle);
+  font-size: 10px;
+  font-weight: 720;
+  letter-spacing: 0.055em;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.assets-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+}
+
+.assets-table tbody tr {
+  transition: background-color var(--transition-fast);
+}
+
+.assets-table tbody tr:hover {
+  background: #f8fbfc;
+}
+
+.assets-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.asset-identity {
+  min-width: 210px;
+}
+
+.asset-name,
+.asset-serial {
+  display: block;
+}
+
+.asset-name {
+  width: fit-content;
+  color: var(--color-ink);
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.asset-name:hover {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+.asset-serial {
+  margin-top: 4px;
+  color: var(--color-ink-subtle);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.025em;
+}
+
+.numeric-value {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.status-badge {
+  padding: 5px 9px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 1.2;
+  text-transform: none;
+  white-space: nowrap;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.status-badge.status-available {
+  color: var(--color-success);
+  background: var(--color-success-soft);
+}
+
+.status-badge.status-assigned {
+  color: var(--color-info);
+  background: var(--color-info-soft);
+}
+
+.status-badge.status-inmaintenance {
+  color: var(--color-warning);
+  background: var(--color-warning-soft);
+}
+
+.status-badge.status-retired {
+  color: var(--color-ink-muted);
+  background: var(--color-surface-strong);
+}
+
+.status-badge.status-lost {
+  color: var(--color-danger);
+  background: var(--color-danger-soft);
+}
+
+.actions-heading {
+  text-align: right !important;
 }
 
 .asset-actions {
-  display: flex;
-  gap: 10px;
-  padding-top: 15px;
-  border-top: 1px solid #eee;
+  width: 1%;
+  padding-top: 14px;
+  border-top: 0;
+  display: table-cell;
+  text-align: right;
+  white-space: nowrap;
 }
 
 .asset-actions .btn {
-  flex: 1;
+  margin-left: 4px;
 }
 
-@media (max-width: 768px) {
-  .assets-grid {
-    grid-template-columns: 1fr;
+.error-state {
+  padding: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  border: 1px solid #efc2c8;
+  border-radius: var(--radius-md);
+  color: var(--color-danger);
+  background: var(--color-danger-soft);
+}
+
+.error-state strong {
+  display: block;
+  color: #8f1728;
+}
+
+.error-state p {
+  margin: 4px 0 0;
+}
+
+.empty-mark {
+  width: 42px;
+  height: 42px;
+  margin: 0 auto 16px;
+  display: block;
+  border: 2px solid var(--color-border-strong);
+  border-radius: 12px;
+  background:
+    linear-gradient(var(--color-border-strong), var(--color-border-strong)) 9px 11px / 20px 2px no-repeat,
+    linear-gradient(var(--color-border), var(--color-border)) 9px 18px / 15px 2px no-repeat,
+    var(--color-surface);
+  box-shadow: 5px 5px 0 var(--color-surface-strong);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Preserve native table semantics at narrow widths; scroll stays inside the data surface. */
+@media (max-width: 720px) {
+  .assets-table-scroll {
+    overflow-x: auto;
   }
 
-  .asset-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
+  .assets-table {
+    min-width: 780px;
+    display: table;
+  }
+
+  .assets-table thead {
+    display: table-header-group;
+  }
+
+  .assets-table tbody {
+    display: table-row-group;
+  }
+
+  .assets-table tr,
+  .assets-table tbody tr:last-child {
+    padding: 0;
+    display: table-row;
+    border-bottom: 0;
+  }
+
+  .assets-table td {
+    padding: 14px 16px;
+    display: table-cell;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .assets-table td[data-label]::before {
+    content: none;
+    display: none;
+  }
+
+  .asset-identity {
+    min-width: 210px;
   }
 
   .asset-actions {
+    width: 1%;
+    padding-top: 14px !important;
+    display: table-cell !important;
+    border-top: 0 !important;
+    text-align: right;
+  }
+
+  .asset-actions .btn {
+    margin-left: 4px;
+  }
+
+  .error-state {
+    align-items: stretch;
     flex-direction: column;
   }
 }

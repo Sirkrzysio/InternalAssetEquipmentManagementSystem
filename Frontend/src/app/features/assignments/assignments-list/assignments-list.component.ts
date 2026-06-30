@@ -7,6 +7,7 @@ import { debounceTime, distinctUntilChanged, startWith } from 'rxjs/operators';
 import { AssignmentService } from '../../../core/services/assignment.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Assignment, PagedResult } from '../../../core/models';
+import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 import { AssignmentTypePipe } from '../../../shared/pipes/assignment-type.pipe';
 
@@ -17,6 +18,7 @@ import { AssignmentTypePipe } from '../../../shared/pipes/assignment-type.pipe';
     CommonModule,
     RouterModule,
     ReactiveFormsModule,
+    ConfirmDialogComponent,
     LoadingSpinnerComponent,
     AssignmentTypePipe
   ],
@@ -43,6 +45,7 @@ export class AssignmentsListComponent implements OnInit {
   selectedStatusFilter: 'all' | 'active' | 'returned' = 'all';
   errorMessage = '';
   returningAsset = '';
+  assignmentPendingReturn: Assignment | null = null;
 
   searchControl = new FormControl('');
 
@@ -80,13 +83,14 @@ export class AssignmentsListComponent implements OnInit {
     const request = {
       page: this.pagedResult.page,
       pageSize: this.pagedResult.pageSize,
-      searchTerm: this.searchControl.value || undefined
+      searchTerm: this.searchControl.value || undefined,
+      isActive: this.selectedStatusFilter === 'all' ? undefined : this.selectedStatusFilter === 'active'
     };
 
     this.assignmentService.getPaged(request).subscribe({
       next: (result) => {
         this.pagedResult = result;
-        this.assignments = this.filterAssignments(result.items);
+        this.assignments = result.items;
         this.isLoading = false;
         this.cdr.detectChanges();
       },
@@ -109,18 +113,6 @@ export class AssignmentsListComponent implements OnInit {
     });
   }
 
-  private filterAssignments(assignments: Assignment[]): Assignment[] {
-    if (this.selectedStatusFilter === 'all') {
-      return assignments;
-    }
-
-    return assignments.filter(assignment => {
-      if (this.selectedStatusFilter === 'active') return assignment.isActive;
-      if (this.selectedStatusFilter === 'returned') return !assignment.isActive;
-      return true;
-    });
-  }
-
   filterByStatus(status: 'all' | 'active' | 'returned'): void {
     this.selectedStatusFilter = status;
     this.pagedResult.page = 1;
@@ -136,11 +128,15 @@ export class AssignmentsListComponent implements OnInit {
 
   returnAsset(assignment: Assignment): void {
     if (!this.canManage) return;
+    this.assignmentPendingReturn = assignment;
+  }
 
-    const confirmed = confirm(`Czy na pewno chcesz zwrócić sprzęt "${assignment.assetName}"?`);
-    if (!confirmed) return;
+  confirmReturnAsset(): void {
+    if (!this.assignmentPendingReturn) return;
 
+    const assignment = this.assignmentPendingReturn;
     this.returningAsset = assignment.id;
+    this.assignmentPendingReturn = null;
 
     this.assignmentService.returnAsset(assignment.id).subscribe({
       next: () => {
@@ -153,6 +149,10 @@ export class AssignmentsListComponent implements OnInit {
         this.returningAsset = '';
       }
     });
+  }
+
+  cancelReturnAsset(): void {
+    this.assignmentPendingReturn = null;
   }
 
   isOverdue(expectedReturnDate: string): boolean {

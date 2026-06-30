@@ -87,12 +87,17 @@ public class AssetRepository : IAssetRepository
             .ToListAsync();
     }
 
-    public async Task<(IEnumerable<Asset> Items, int TotalCount)> GetPagedAsync(int page, int pageSize, string? searchTerm = null)
+    public async Task<(IEnumerable<Asset> Items, int TotalCount)> GetPagedAsync(int page, int pageSize, string? searchTerm = null, AssetStatus? status = null)
     {
         var query = _context.Assets
             .Include(a => a.Category)
             .Include(a => a.Location)
             .AsQueryable();
+
+        if (status.HasValue)
+        {
+            query = query.Where(a => a.Status == status.Value);
+        }
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {

@@ -78,13 +78,17 @@ export class AuditLogsListComponent implements OnInit {
     const request = {
       page: this.pagedResult.page,
       pageSize: this.pagedResult.pageSize,
-      searchTerm: this.userEmailFilter.value || undefined
+      searchTerm: this.userEmailFilter.value || undefined,
+      entityName: this.entityNameFilter.value || undefined,
+      action: this.actionFilter.value || undefined,
+      dateFrom: this.dateFromFilter.value || undefined,
+      dateTo: this.dateToFilter.value || undefined
     };
 
     this.auditLogService.getPaged(request).subscribe({
       next: (result) => {
         this.pagedResult = result;
-        this.auditLogs = this.applyClientSideFilters(result.items);
+        this.auditLogs = result.items;
         this.isLoading = false;
         this.cdr.detectChanges();
       },
@@ -105,39 +109,6 @@ export class AuditLogsListComponent implements OnInit {
         this.cdr.detectChanges();
       }
     });
-  }
-
-  private applyClientSideFilters(logs: AuditLog[]): AuditLog[] {
-    let filtered = [...logs];
-
-    // Filter by entity name
-    const entityName = this.entityNameFilter.value;
-    if (entityName) {
-      filtered = filtered.filter(log => log.entityName === entityName);
-    }
-
-    // Filter by action
-    const action = this.actionFilter.value;
-    if (action) {
-      filtered = filtered.filter(log => log.action === action);
-    }
-
-    // Filter by date range
-    const dateFrom = this.dateFromFilter.value;
-    const dateTo = this.dateToFilter.value;
-
-    if (dateFrom) {
-      const fromDate = new Date(dateFrom);
-      filtered = filtered.filter(log => new Date(log.timestamp) >= fromDate);
-    }
-
-    if (dateTo) {
-      const toDate = new Date(dateTo);
-      toDate.setHours(23, 59, 59, 999); // End of day
-      filtered = filtered.filter(log => new Date(log.timestamp) <= toDate);
-    }
-
-    return filtered;
   }
 
   applyFilters(): void {
@@ -166,7 +137,10 @@ export class AuditLogsListComponent implements OnInit {
       'Create': 'Utworzenie',
       'Update': 'Aktualizacja',
       'Delete': 'Usunięcie',
-      'Restore': 'Przywrócenie'
+      'Assign': 'Przypisanie',
+      'Unassign': 'Odpięcie',
+      'Login': 'Logowanie',
+      'Logout': 'Wylogowanie'
     };
     return labels[action] || action;
   }
