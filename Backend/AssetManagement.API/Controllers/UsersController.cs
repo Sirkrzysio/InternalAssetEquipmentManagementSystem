@@ -1,5 +1,6 @@
-﻿using AssetManagement.Application.DTOs.Users;
+using AssetManagement.Application.DTOs.Users;
 using AssetManagement.Application.Interfaces;
+using AssetManagement.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -28,9 +29,14 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet("paged")]
-    public async Task<IActionResult> GetPaged([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string? searchTerm = null)
+    public async Task<IActionResult> GetPaged(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10,
+        [FromQuery] string? searchTerm = null,
+        [FromQuery] bool? isActive = null,
+        [FromQuery] UserRole? role = null)
     {
-        var result = await _userService.GetPagedAsync(page, pageSize, searchTerm);
+        var result = await _userService.GetPagedAsync(page, pageSize, searchTerm, isActive, role);
         if (!result.IsSuccess)
             return BadRequest(result.Error);
 

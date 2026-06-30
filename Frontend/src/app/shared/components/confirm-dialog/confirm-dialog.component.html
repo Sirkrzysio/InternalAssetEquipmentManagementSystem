@@ -1,15 +1,27 @@
 ﻿<div class="modal-overlay" *ngIf="isOpen" (click)="onOverlayClick($event)">
-  <div class="modal-content" (click)="$event.stopPropagation()">
+  <div
+    #dialogPanel
+    class="modal-content"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="confirm-dialog-title"
+    aria-describedby="confirm-dialog-message"
+    tabindex="-1"
+    (click)="$event.stopPropagation()"
+  >
     <div class="modal-header">
-      <h3>{{ title }}</h3>
-      <button class="close-btn" (click)="onCancel()" aria-label="Zamknij">×</button>
+      <div>
+        <span class="dialog-kicker">{{ type === 'danger' ? 'Wymaga potwierdzenia' : 'Potwierdzenie operacji' }}</span>
+        <h3 id="confirm-dialog-title">{{ title }}</h3>
+      </div>
+      <button class="close-btn" (click)="onCancel()" [disabled]="isProcessing" aria-label="Zamknij dialog">×</button>
     </div>
 
     <div class="modal-body">
       <div class="icon-container" [ngClass]="'icon-' + type">
-        <span class="icon">{{ getIcon() }}</span>
+        <span class="icon" aria-hidden="true"></span>
       </div>
-      <p>{{ message }}</p>
+      <p id="confirm-dialog-message">{{ message }}</p>
       <div *ngIf="details" class="details">
         {{ details }}
       </div>
@@ -17,6 +29,7 @@
 
     <div class="modal-footer">
       <button
+        #cancelButton
         class="btn btn-secondary"
         (click)="onCancel()"
         [disabled]="isProcessing"

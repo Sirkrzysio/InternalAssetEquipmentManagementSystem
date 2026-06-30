@@ -37,10 +37,11 @@ public class AuditLoggingMiddleware
             {
                 var path = context.Request.Path.Value ?? "";
                 var entityName = path.Split('/').Skip(2).FirstOrDefault() ?? "Unknown";
+                var entityId = GetEntityId(context);
 
                 await auditService.LogAsync(
                     entityName,
-                    Guid.Empty,
+                    entityId,
                     action,
                     null,
                     null,
@@ -50,6 +51,15 @@ public class AuditLoggingMiddleware
                 );
             }
         }
+    }
+
+    private static Guid GetEntityId(HttpContext context)
+    {
+        var routeId = context.Request.RouteValues["id"]?.ToString();
+        if (Guid.TryParse(routeId, out var entityId))
+            return entityId;
+
+        return Guid.Empty;
     }
 }
 

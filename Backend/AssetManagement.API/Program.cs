@@ -7,8 +7,6 @@ using AssetManagement.Infrastructure;
 using AssetManagement.Infrastructure.Data;
 using AssetManagement.Infrastructure.Data.Seed;
 using AssetManagement.Application.Interfaces.Security;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,7 +41,7 @@ if (app.Environment.IsDevelopment())
 
 // Middleware
 app.UseExceptionHandling();
-app.UseCors("AllowAll");
+app.UseCors("ConfiguredOrigins");
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
@@ -52,13 +50,13 @@ app.UseAuditLogging();
 
 app.MapControllers();
 
-// Database Migration & Seeding
-using (var scope = app.Services.CreateScope())
+// Development data seeding
+if (builder.Configuration.GetValue<bool>("SeedData:Enabled"))
 {
+    using var scope = app.Services.CreateScope();
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     var passwordHasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
 
-    // Apply migrations
     await DataSeeder.SeedAsync(dbContext, passwordHasher);
 }
 

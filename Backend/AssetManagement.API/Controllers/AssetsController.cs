@@ -1,5 +1,6 @@
-﻿﻿using AssetManagement.Application.DTOs.Assets;
+using AssetManagement.Application.DTOs.Assets;
 using AssetManagement.Application.Interfaces;
+using AssetManagement.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,7 +17,6 @@ public class AssetsController : ControllerBase
     {
         _assetService = assetService;
     }
-    
 
     [HttpGet]
     public async Task<IActionResult> GetAll()
@@ -27,11 +27,15 @@ public class AssetsController : ControllerBase
 
         return Ok(result.Data);
     }
-    
+
     [HttpGet("paged")]
-    public async Task<IActionResult> GetPaged([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string? searchTerm = null)
+    public async Task<IActionResult> GetPaged(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10,
+        [FromQuery] string? searchTerm = null,
+        [FromQuery] AssetStatus? status = null)
     {
-        var result = await _assetService.GetPagedAsync(page, pageSize, searchTerm);
+        var result = await _assetService.GetPagedAsync(page, pageSize, searchTerm, status);
         if (!result.IsSuccess)
             return BadRequest(result.Error);
 

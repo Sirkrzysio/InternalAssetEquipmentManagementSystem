@@ -1,4 +1,4 @@
-﻿﻿using AssetManagement.Application.DTOs.Assignments;
+using AssetManagement.Application.DTOs.Assignments;
 using AssetManagement.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -28,9 +28,13 @@ public class AssignmentsController : ControllerBase
     }
 
     [HttpGet("paged")]
-    public async Task<IActionResult> GetPaged([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string? searchTerm = null)
+    public async Task<IActionResult> GetPaged(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10,
+        [FromQuery] string? searchTerm = null,
+        [FromQuery] bool? isActive = null)
     {
-        var result = await _assignmentService.GetPagedAsync(page, pageSize, searchTerm);
+        var result = await _assignmentService.GetPagedAsync(page, pageSize, searchTerm, isActive);
         if (!result.IsSuccess)
             return BadRequest(result.Error);
 

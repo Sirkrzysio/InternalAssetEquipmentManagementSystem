@@ -20,10 +20,14 @@ namespace AssetManagement.API.Extensions
             // CORS
             services.AddCors(options =>
             {
-                options.AddPolicy("AllowAll", builder =>
+                options.AddPolicy("ConfiguredOrigins", builder =>
                 {
+                    var allowedOrigins = configuration
+                        .GetSection("Cors:AllowedOrigins")
+                        .Get<string[]>() ?? Array.Empty<string>();
+
                     builder
-                        .AllowAnyOrigin()
+                        .WithOrigins(allowedOrigins)
                         .AllowAnyMethod()
                         .AllowAnyHeader();
                 });

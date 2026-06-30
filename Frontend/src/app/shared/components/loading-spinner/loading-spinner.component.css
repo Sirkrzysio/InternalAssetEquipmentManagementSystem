@@ -27,3 +27,44 @@
   font-size: 14px;
   color: #666;
 }
+
+.loading-spinner {
+  min-height: 104px;
+  padding: 24px;
+  gap: 12px;
+}
+
+.spinner {
+  position: relative;
+  border-color: var(--color-border);
+  border-top-color: var(--color-primary);
+  box-shadow: 0 0 0 1px rgb(8 126 139 / 4%);
+}
+
+.medium .spinner {
+  width: 34px;
+  height: 34px;
+}
+
+.large .spinner {
+  width: 48px;
+  height: 48px;
+}
+
+.loading-message {
+  margin: 0;
+  color: var(--color-ink-muted);
+  font-size: 12px;
+  font-weight: 550;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

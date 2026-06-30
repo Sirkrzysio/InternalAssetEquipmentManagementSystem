@@ -1,4 +1,5 @@
-﻿<div class="loading-spinner" [ngClass]="size">
-  <div class="spinner"></div>
+﻿<div class="loading-spinner" [ngClass]="size" role="status" aria-live="polite">
+  <div class="spinner" aria-hidden="true"></div>
   <p *ngIf="message" class="loading-message">{{ message }}</p>
+  <span *ngIf="!message" class="visually-hidden">Ładowanie</span>
 </div>

@@ -1,4 +1,4 @@
-﻿import { Component, inject } from '@angular/core';
+﻿import { Component, ElementRef, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
@@ -12,6 +12,8 @@ import { AuthService } from '../../../core/services/auth.service';
 })
 export class NavbarComponent {
   private readonly authService = inject(AuthService);
+  @ViewChild('menuToggle') private menuToggle?: ElementRef<HTMLButtonElement>;
+  isMenuOpen = false;
 
   get currentUser() {
     return this.authService.currentUser;
@@ -25,7 +27,25 @@ export class NavbarComponent {
     return this.authService.hasAnyRole(['Admin', 'Manager']);
   }
 
+  toggleMenu(): void {
+    this.isMenuOpen = !this.isMenuOpen;
+  }
+
+  closeMenu(): void {
+    this.isMenuOpen = false;
+  }
+
+  closeMenuFromKeyboard(): void {
+    if (!this.isMenuOpen) {
+      return;
+    }
+
+    this.closeMenu();
+    this.menuToggle?.nativeElement.focus();
+  }
+
   logout(): void {
+    this.closeMenu();
     this.authService.logout().subscribe({
       next: () => {
         // Logout successful - AuthService already navigates to login
