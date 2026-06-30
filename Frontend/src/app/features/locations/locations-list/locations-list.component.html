@@ -1,20 +1,25 @@
 ﻿﻿<div class="locations-container">
   <header class="page-header">
-    <h1>Lokalizacje</h1>
+    <div>
+      <p class="page-eyebrow">Mapa organizacji</p>
+      <h1>Lokalizacje</h1>
+      <p class="page-description">Utrzymuj spójną strukturę biur, magazynów i punktów użytkowania.</p>
+    </div>
     <button
       *ngIf="canManage"
       (click)="showCreateForm = true"
       class="btn btn-primary"
     >
-      + Dodaj Lokalizację
+      <span aria-hidden="true">+</span>
+      Dodaj lokalizację
     </button>
   </header>
 
   <!-- Create/Edit Form Modal -->
   <div class="modal-overlay" *ngIf="showCreateForm || editingLocation">
-    <div class="modal-content">
+    <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="location-dialog-title">
       <div class="modal-header">
-        <h3>{{ editingLocation ? 'Edytuj Lokalizację' : 'Nowa Lokalizacja' }}</h3>
+        <h3 id="location-dialog-title">{{ editingLocation ? 'Edytuj lokalizację' : 'Nowa lokalizacja' }}</h3>
       </div>
 
       <form [formGroup]="locationForm" (ngSubmit)="onSubmit()">
@@ -68,7 +73,9 @@
 
   <!-- Search Section -->
   <div class="search-section">
+    <label for="location-search">Wyszukaj lokalizację</label>
     <input
+      id="location-search"
       type="text"
       placeholder="Szukaj lokalizacji..."
       [formControl]="searchControl"
@@ -77,7 +84,7 @@
   </div>
 
   <!-- Success Message -->
-  <div *ngIf="successMessage" class="success-banner">
+  <div *ngIf="successMessage" class="success-banner" role="status">
     {{ successMessage }}
   </div>
 
@@ -154,7 +161,20 @@
   </div>
 
 
-  <div *ngIf="errorMessage" class="error-banner">
+  <div *ngIf="errorMessage" class="error-banner" role="alert">
     {{ errorMessage }}
   </div>
+
+  <app-confirm-dialog
+    [isOpen]="!!locationPendingDelete"
+    title="Usuń lokalizację"
+    [message]="'Czy na pewno chcesz usunąć lokalizację &quot;' + (locationPendingDelete?.name || '') + '&quot;?'"
+    details="Ta operacja może wpłynąć na przypisane aktywa."
+    type="danger"
+    confirmText="Usuń"
+    processingText="Usuwanie..."
+    [isProcessing]="!!deletingLocation"
+    (confirm)="confirmDeleteLocation()"
+    (cancel)="cancelDeleteLocation()"
+  ></app-confirm-dialog>
 </div>

@@ -67,7 +67,11 @@ public class CategoryService : ICategoryService
         await _unitOfWork.Categories.UpdateAsync(category);
         await _unitOfWork.SaveChangesAsync();
 
-        return Result<CategoryDto>.Success(_mapper.Map<CategoryDto>(category));
+        var result = await _unitOfWork.Categories.GetByIdWithAssetsAsync(id);
+        if (result == null)
+            return Result<CategoryDto>.Failure("Kategoria nie została znaleziona");
+
+        return Result<CategoryDto>.Success(_mapper.Map<CategoryDto>(result));
     }
 
     public async Task<Result> DeleteAsync(Guid id)

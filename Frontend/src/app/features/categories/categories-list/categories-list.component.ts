@@ -6,6 +6,7 @@ import { debounceTime, distinctUntilChanged, startWith } from 'rxjs/operators';
 import { CategoryService } from '../../../core/services/category.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Category } from '../../../core/models';
+import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 
 @Component({
@@ -14,10 +15,15 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    ConfirmDialogComponent,
     LoadingSpinnerComponent
   ],
   templateUrl: './categories-list.component.html',
-  styleUrls: ['../categories-shared.styles.css', './categories-list.component.css']
+  styleUrls: [
+    '../categories-shared.styles.css',
+    './categories-list.component.css',
+    '../../../shared/styles/collection-management.css'
+  ]
 })
 export class CategoriesListComponent implements OnInit {
   private readonly categoryService = inject(CategoryService);
@@ -36,6 +42,7 @@ export class CategoriesListComponent implements OnInit {
   editingCategory: Category | null = null;
   isSubmitting = false;
   deletingCategory = '';
+  categoryPendingDelete: Category | null = null;
 
   // Search
   searchControl = new FormControl('');
@@ -167,14 +174,15 @@ export class CategoriesListComponent implements OnInit {
   }
 
   deleteCategory(category: Category): void {
-    const confirmed = confirm(
-      `Czy na pewno chcesz usunąć kategorię "${category.name}"?\n\n` +
-      `Uwaga: Ta operacja może wpłynąć na przypisane aktywa.`
-    );
+    this.categoryPendingDelete = category;
+  }
 
-    if (!confirmed) return;
+  confirmDeleteCategory(): void {
+    if (!this.categoryPendingDelete) return;
 
+    const category = this.categoryPendingDelete;
     this.deletingCategory = category.id;
+    this.categoryPendingDelete = null;
 
     this.categoryService.delete(category.id).subscribe({
       next: () => {
@@ -193,6 +201,10 @@ export class CategoriesListComponent implements OnInit {
         this.deletingCategory = '';
       }
     });
+  }
+
+  cancelDeleteCategory(): void {
+    this.categoryPendingDelete = null;
   }
 
   private markFormGroupTouched(): void {

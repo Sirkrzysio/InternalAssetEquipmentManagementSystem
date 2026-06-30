@@ -10,7 +10,7 @@ public interface IAssignmentService
     Task<Result<IEnumerable<AssignmentDto>>> GetByAssetIdAsync(Guid assetId);
     Task<Result<IEnumerable<AssignmentDto>>> GetByUserIdAsync(Guid userId);
     Task<Result<PagedResult<AssignmentDto>>> GetPagedAsync(int page, int pageSize);
-    Task<Result<PagedResult<AssignmentDto>>> GetPagedAsync(int page, int pageSize, string? searchTerm);
+    Task<Result<PagedResult<AssignmentDto>>> GetPagedAsync(int page, int pageSize, string? searchTerm, bool? isActive = null);
     Task<Result<IEnumerable<AssignmentDto>>> GetActiveAssignmentsAsync();
     Task<Result<AssignmentDto>> CreateAsync(CreateAssignmentDto dto);
     Task<Result> ReturnAssetAsync(Guid assignmentId);

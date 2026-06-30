@@ -9,6 +9,13 @@ public interface IAuditService
     Task LogAsync(string entityName, Guid entityId, AuditAction action, string? oldValues, string? newValues, Guid? userId, string? userName, string? ipAddress);
     Task<Result<IEnumerable<AuditLog>>> GetByEntityAsync(string entityName, Guid entityId);
     Task<Result<PagedResult<AuditLog>>> GetPagedAsync(int page, int pageSize);
-    Task<Result<PagedResult<AuditLog>>> GetPagedAsync(int page, int pageSize, string? searchTerm);
+    Task<Result<PagedResult<AuditLog>>> GetPagedAsync(
+        int page,
+        int pageSize,
+        string? searchTerm,
+        string? entityName = null,
+        AuditAction? action = null,
+        DateTime? dateFrom = null,
+        DateTime? dateTo = null);
     Task<Result<IEnumerable<AuditLog>>> GetByUserAsync(Guid userId);
 }

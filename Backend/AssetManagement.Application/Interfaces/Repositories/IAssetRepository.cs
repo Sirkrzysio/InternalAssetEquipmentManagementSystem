@@ -15,7 +15,7 @@ public interface IAssetRepository
     Task<IEnumerable<Asset>> GetByStatusAsync(string status);
     Task<IEnumerable<Asset>> GetByCategoryAsync(Guid categoryId);
     Task<IEnumerable<Asset>> GetByLocationAsync(Guid locationId);
-    Task<(IEnumerable<Asset> Items, int TotalCount)> GetPagedAsync(int page, int pageSize, string? searchTerm = null);
+    Task<(IEnumerable<Asset> Items, int TotalCount)> GetPagedAsync(int page, int pageSize, string? searchTerm = null, AssetStatus? status = null);
     Task<Asset> AddAsync(Asset asset);
     Task UpdateAsync(Asset asset);
     Task DeleteAsync(Guid id);

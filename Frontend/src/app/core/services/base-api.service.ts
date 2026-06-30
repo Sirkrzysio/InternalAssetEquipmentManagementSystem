@@ -31,6 +31,13 @@ export abstract class BaseApiService<T, TCreate = Partial<T>, TUpdate = Partial<
     if (request.page) params = params.set('page', request.page.toString());
     if (request.pageSize) params = params.set('pageSize', request.pageSize.toString());
     if (request.searchTerm) params = params.set('searchTerm', request.searchTerm);
+    if (request.status !== undefined) params = params.set('status', request.status.toString());
+    if (request.isActive !== undefined) params = params.set('isActive', request.isActive.toString());
+    if (request.role !== undefined) params = params.set('role', request.role.toString());
+    if (request.entityName) params = params.set('entityName', request.entityName);
+    if (request.action) params = params.set('action', request.action);
+    if (request.dateFrom) params = params.set('dateFrom', request.dateFrom);
+    if (request.dateTo) params = params.set('dateTo', request.dateTo);
 
     return this.http.get<PagedResult<T>>(`${this.baseUrl}/paged`, { params });
   }

@@ -38,12 +38,16 @@ public class LocationRepository : ILocationRepository
 
     public async Task<IEnumerable<Location>> GetAllAsync()
     {
-        return await _context.Locations.ToListAsync();
+        return await _context.Locations
+            .Include(l => l.Assets)
+            .ToListAsync();
     }
 
     public async Task<(IEnumerable<Location> Items, int TotalCount)> GetPagedAsync(int page, int pageSize, string? searchTerm = null)
     {
-        var query = _context.Locations.AsQueryable();
+        var query = _context.Locations
+            .Include(l => l.Assets)
+            .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {

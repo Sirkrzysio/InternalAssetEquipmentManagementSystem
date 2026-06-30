@@ -12,7 +12,7 @@ public interface IUserRepository
     Task<IEnumerable<User>> GetAllDeletedAsync();
     Task<IEnumerable<User>> GetByRoleAsync(UserRole role);
     Task<IEnumerable<User>> GetActiveUsersAsync();
-    Task<(IEnumerable<User> Items, int TotalCount)> GetPagedAsync(int page, int pageSize, string? searchTerm = null);
+    Task<(IEnumerable<User> Items, int TotalCount)> GetPagedAsync(int page, int pageSize, string? searchTerm = null, bool? isActive = null, UserRole? role = null);
     Task<User> AddAsync(User user);
     Task UpdateAsync(User user);
     Task DeleteAsync(Guid id);

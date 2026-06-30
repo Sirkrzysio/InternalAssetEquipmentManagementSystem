@@ -19,7 +19,11 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
     LoadingSpinnerComponent
   ],
   templateUrl: './location-form.component.html',
-  styleUrls: ['../locations-shared.styles.css', './location-form.component.css']
+  styleUrls: [
+    '../locations-shared.styles.css',
+    './location-form.component.css',
+    '../../../shared/styles/enterprise-form.css'
+  ]
 })
 export class LocationFormComponent implements OnInit {
   private readonly fb = inject(FormBuilder);

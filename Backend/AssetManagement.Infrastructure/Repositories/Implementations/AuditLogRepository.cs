@@ -79,7 +79,14 @@ public class AuditLogRepository : IAuditLogRepository
         return (items, totalCount);
     }
 
-    public async Task<(IEnumerable<AuditLog> Items, int TotalCount)> GetPagedAsync(int page, int pageSize, string? searchTerm)
+    public async Task<(IEnumerable<AuditLog> Items, int TotalCount)> GetPagedAsync(
+        int page,
+        int pageSize,
+        string? searchTerm,
+        string? entityName = null,
+        AuditAction? action = null,
+        DateTime? dateFrom = null,
+        DateTime? dateTo = null)
     {
         // Walidacja parametrów
         if (page < 1) page = 1;
@@ -88,13 +95,45 @@ public class AuditLogRepository : IAuditLogRepository
 
         var query = _context.AuditLogs.AsQueryable();
 
+        if (!string.IsNullOrWhiteSpace(entityName))
+        {
+            query = query.Where(a => a.EntityName == entityName);
+        }
+
+        if (action.HasValue)
+        {
+            query = query.Where(a => a.Action == action.Value);
+        }
+
+        if (dateFrom.HasValue)
+        {
+            query = query.Where(a => a.Timestamp >= dateFrom.Value.Date);
+        }
+
+        if (dateTo.HasValue)
+        {
+            var exclusiveDateTo = dateTo.Value.Date.AddDays(1);
+            query = query.Where(a => a.Timestamp < exclusiveDateTo);
+        }
+
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
-            query = query.Where(a => 
-                EF.Functions.ILike(a.EntityName, $"%{searchTerm}%") ||
-                EF.Functions.ILike(a.Action.ToString(), $"%{searchTerm}%") ||
-                (a.UserName != null && EF.Functions.ILike(a.UserName, $"%{searchTerm}%")) ||
-                (a.IpAddress != null && EF.Functions.ILike(a.IpAddress, $"%{searchTerm}%")));
+            var searchPattern = $"%{searchTerm}%";
+            if (Enum.TryParse<AuditAction>(searchTerm, true, out var searchedAction))
+            {
+                query = query.Where(a =>
+                    EF.Functions.ILike(a.EntityName, searchPattern) ||
+                    a.Action == searchedAction ||
+                    (a.UserName != null && EF.Functions.ILike(a.UserName, searchPattern)) ||
+                    (a.IpAddress != null && EF.Functions.ILike(a.IpAddress, searchPattern)));
+            }
+            else
+            {
+                query = query.Where(a =>
+                    EF.Functions.ILike(a.EntityName, searchPattern) ||
+                    (a.UserName != null && EF.Functions.ILike(a.UserName, searchPattern)) ||
+                    (a.IpAddress != null && EF.Functions.ILike(a.IpAddress, searchPattern)));
+            }
         }
 
         var totalCount = await query.CountAsync();

@@ -8,6 +8,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { LocationService } from '../../../core/services/location.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Location } from '../../../core/models';
+import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 
 @Component({
@@ -16,10 +17,15 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    ConfirmDialogComponent,
     LoadingSpinnerComponent
   ],
   templateUrl: './locations-list.component.html',
-  styleUrls: ['../locations-shared.styles.css', './locations-list.component.css']
+  styleUrls: [
+    '../locations-shared.styles.css',
+    './locations-list.component.css',
+    '../../../shared/styles/collection-management.css'
+  ]
 })
 export class LocationsListComponent implements OnInit {
   private readonly locationService = inject(LocationService);
@@ -38,6 +44,7 @@ export class LocationsListComponent implements OnInit {
   editingLocation: Location | null = null;
   isSubmitting = false;
   deletingLocation = '';
+  locationPendingDelete: Location | null = null;
 
   // Search
   searchControl = new FormControl('');
@@ -172,14 +179,15 @@ export class LocationsListComponent implements OnInit {
   }
 
   deleteLocation(location: Location): void {
-    const confirmed = confirm(
-      `Czy na pewno chcesz usunąć lokalizację "${location.name}"?\n\n` +
-      `Uwaga: Ta operacja może wpłynąć na przypisane aktywa.`
-    );
+    this.locationPendingDelete = location;
+  }
 
-    if (!confirmed) return;
+  confirmDeleteLocation(): void {
+    if (!this.locationPendingDelete) return;
 
+    const location = this.locationPendingDelete;
     this.deletingLocation = location.id;
+    this.locationPendingDelete = null;
 
     this.locationService.delete(location.id).subscribe({
       next: () => {
@@ -198,6 +206,10 @@ export class LocationsListComponent implements OnInit {
         this.deletingLocation = '';
       }
     });
+  }
+
+  cancelDeleteLocation(): void {
+    this.locationPendingDelete = null;
   }
 
   private markFormGroupTouched(): void {

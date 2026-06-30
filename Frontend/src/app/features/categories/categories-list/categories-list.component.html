@@ -1,20 +1,25 @@
 ﻿<div class="categories-container">
   <header class="page-header">
-    <h1>Kategorie Sprzętu</h1>
+    <div>
+      <p class="page-eyebrow">Klasyfikacja zasobów</p>
+      <h1>Kategorie sprzętu</h1>
+      <p class="page-description">Porządkuj aktywa według ich typu i przeznaczenia.</p>
+    </div>
     <button
       *ngIf="canManage"
       (click)="showCreateForm = true"
       class="btn btn-primary"
     >
-      + Dodaj Kategorię
+      <span aria-hidden="true">+</span>
+      Dodaj kategorię
     </button>
   </header>
 
   <!-- Create/Edit Form Modal -->
   <div class="modal-overlay" *ngIf="showCreateForm || editingCategory">
-    <div class="modal-content">
+    <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="category-dialog-title">
       <div class="modal-header">
-        <h3>{{ editingCategory ? 'Edytuj Kategorię' : 'Nowa Kategoria' }}</h3>
+        <h3 id="category-dialog-title">{{ editingCategory ? 'Edytuj kategorię' : 'Nowa kategoria' }}</h3>
       </div>
 
       <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()">
@@ -58,7 +63,9 @@
 
   <!-- Search Section -->
   <div class="search-section">
+    <label for="category-search">Wyszukaj kategorię</label>
     <input
+      id="category-search"
       type="text"
       placeholder="Szukaj kategorii..."
       [formControl]="searchControl"
@@ -67,7 +74,7 @@
   </div>
 
   <!-- Success Message -->
-  <div *ngIf="successMessage" class="success-banner">
+  <div *ngIf="successMessage" class="success-banner" role="status">
     {{ successMessage }}
   </div>
 
@@ -137,7 +144,20 @@
   </div>
 
 
-  <div *ngIf="errorMessage" class="error-banner">
+  <div *ngIf="errorMessage" class="error-banner" role="alert">
     {{ errorMessage }}
   </div>
+
+  <app-confirm-dialog
+    [isOpen]="!!categoryPendingDelete"
+    title="Usuń kategorię"
+    [message]="'Czy na pewno chcesz usunąć kategorię &quot;' + (categoryPendingDelete?.name || '') + '&quot;?'"
+    details="Ta operacja może wpłynąć na przypisane aktywa."
+    type="danger"
+    confirmText="Usuń"
+    processingText="Usuwanie..."
+    [isProcessing]="!!deletingCategory"
+    (confirm)="confirmDeleteCategory()"
+    (cancel)="cancelDeleteCategory()"
+  ></app-confirm-dialog>
 </div>

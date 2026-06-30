@@ -29,4 +29,11 @@ export interface PagedRequest {
   page?: number;
   pageSize?: number;
   searchTerm?: string;
+  status?: number | string;
+  isActive?: boolean;
+  role?: number | string;
+  entityName?: string;
+  action?: string;
+  dateFrom?: string;
+  dateTo?: string;
 }

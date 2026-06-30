@@ -44,12 +44,16 @@ public class CategoryRepository : ICategoryRepository
 
     public async Task<IEnumerable<Category>> GetAllAsync()
     {
-        return await _context.Categories.ToListAsync();
+        return await _context.Categories
+            .Include(c => c.Assets)
+            .ToListAsync();
     }
 
     public async Task<(IEnumerable<Category> Items, int TotalCount)> GetPagedAsync(int page, int pageSize, string? searchTerm = null)
     {
-        var query = _context.Categories.AsQueryable();
+        var query = _context.Categories
+            .Include(c => c.Assets)
+            .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {

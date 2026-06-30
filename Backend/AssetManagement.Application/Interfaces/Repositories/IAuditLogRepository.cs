@@ -12,7 +12,14 @@ public interface IAuditLogRepository
     Task<IEnumerable<AuditLog>> GetByActionAsync(AuditAction action);
     Task<IEnumerable<AuditLog>> GetByDateRangeAsync(DateTime from, DateTime to);
     Task<(IEnumerable<AuditLog> Items, int TotalCount)> GetPagedAsync(int page, int pageSize);
-    Task<(IEnumerable<AuditLog> Items, int TotalCount)> GetPagedAsync(int page, int pageSize, string? searchTerm);
+    Task<(IEnumerable<AuditLog> Items, int TotalCount)> GetPagedAsync(
+        int page,
+        int pageSize,
+        string? searchTerm,
+        string? entityName = null,
+        AuditAction? action = null,
+        DateTime? dateFrom = null,
+        DateTime? dateTo = null);
     Task<AuditLog> AddAsync(AuditLog auditLog);
     Task<int> CleanupOldDeletedAsync(DateTime cutoffDate);
     Task<int> CleanupAllDeletedAsync();

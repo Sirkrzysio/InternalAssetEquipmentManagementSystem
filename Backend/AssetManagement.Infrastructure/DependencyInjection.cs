@@ -40,6 +40,8 @@ public static class DependencyInjection
         var jwtSection = configuration.GetSection("JwtSettings");
         services.Configure<JwtSettings>(jwtSection);
         var jwtSettings = jwtSection.Get<JwtSettings>() ?? new JwtSettings();
+        if (string.IsNullOrWhiteSpace(jwtSettings.Secret) || jwtSettings.Secret.Length < 32)
+            throw new InvalidOperationException("JwtSettings:Secret must be configured with at least 32 characters.");
 
         services.AddAuthentication(options =>
         {

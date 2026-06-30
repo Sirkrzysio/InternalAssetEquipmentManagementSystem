@@ -13,7 +13,7 @@ public interface IAssignmentRepository
     Task<IEnumerable<Assignment>> GetActiveAsync();
     Task<Assignment?> GetActiveAssignmentForAssetAsync(Guid assetId);
     Task<(IEnumerable<Assignment> Items, int TotalCount)> GetPagedAsync(int page, int pageSize);
-    Task<(IEnumerable<Assignment> Items, int TotalCount)> GetPagedAsync(int page, int pageSize, string? searchTerm);
+    Task<(IEnumerable<Assignment> Items, int TotalCount)> GetPagedAsync(int page, int pageSize, string? searchTerm, bool? isActive = null);
     Task<Assignment> AddAsync(Assignment assignment);
     Task UpdateAsync(Assignment assignment);
     Task DeleteAsync(Guid id);

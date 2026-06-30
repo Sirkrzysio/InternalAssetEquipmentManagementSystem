@@ -61,7 +61,11 @@ public class LocationService : ILocationService
         await _unitOfWork.Locations.UpdateAsync(location);
         await _unitOfWork.SaveChangesAsync();
 
-        return Result<LocationDto>.Success(_mapper.Map<LocationDto>(location));
+        var result = await _unitOfWork.Locations.GetByIdWithAssetsAsync(id);
+        if (result == null)
+            return Result<LocationDto>.Failure("Lokalizacja nie zostala znaleziona");
+
+        return Result<LocationDto>.Success(_mapper.Map<LocationDto>(result));
     }
 
     public async Task<Result> DeleteAsync(Guid id)

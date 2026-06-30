@@ -7,7 +7,7 @@ public interface IAssetService
 {
     Task<Result<AssetDto>> GetByIdAsync(Guid id);
     Task<Result<IEnumerable<AssetDto>>> GetAllAsync();
-    Task<Result<PagedResult<AssetDto>>> GetPagedAsync(int page, int pageSize, string? searchTerm = null);
+    Task<Result<PagedResult<AssetDto>>> GetPagedAsync(int page, int pageSize, string? searchTerm = null, AssetManagement.Domain.Enums.AssetStatus? status = null);
     Task<Result<IEnumerable<AssetDto>>> GetByCategoryAsync(Guid categoryId);
     Task<Result<IEnumerable<AssetDto>>> GetByStatusAsync(string status);
     Task<Result<IEnumerable<AssetDto>>> GetByLocationAsync(Guid locationId);

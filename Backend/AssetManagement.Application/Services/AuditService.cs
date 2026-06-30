@@ -55,9 +55,16 @@ public class AuditService : IAuditService
         return Result<PagedResult<AuditLog>>.Success(PagedResult<AuditLog>.Create(items, totalCount, page, pageSize));
     }
 
-    public async Task<Result<PagedResult<AuditLog>>> GetPagedAsync(int page, int pageSize, string? searchTerm)
+    public async Task<Result<PagedResult<AuditLog>>> GetPagedAsync(
+        int page,
+        int pageSize,
+        string? searchTerm,
+        string? entityName = null,
+        AuditAction? action = null,
+        DateTime? dateFrom = null,
+        DateTime? dateTo = null)
     {
-        var (items, totalCount) = await _unitOfWork.AuditLogs.GetPagedAsync(page, pageSize, searchTerm);
+        var (items, totalCount) = await _unitOfWork.AuditLogs.GetPagedAsync(page, pageSize, searchTerm, entityName, action, dateFrom, dateTo);
         return Result<PagedResult<AuditLog>>.Success(PagedResult<AuditLog>.Create(items, totalCount, page, pageSize));
     }
 
