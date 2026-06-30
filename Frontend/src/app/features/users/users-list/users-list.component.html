@@ -1,18 +1,25 @@
 ﻿<div class="users-container">
   <header class="page-header">
-    <h1>Zarządzanie Użytkownikami</h1>
-    <button
+    <div>
+      <p class="page-eyebrow">Dostęp i odpowiedzialność</p>
+      <h1>Użytkownicy</h1>
+      <p class="page-description">Zarządzaj kontami, rolami i aktywnością pracowników.</p>
+    </div>
+    <a
       *ngIf="canManage"
       routerLink="/users/create"
       class="btn btn-primary"
     >
-      + Dodaj Użytkownika
-    </button>
+      <span aria-hidden="true">+</span>
+      Dodaj użytkownika
+    </a>
   </header>
 
   <div class="filters-section">
     <div class="search-box">
+      <label for="user-search">Wyszukaj użytkownika</label>
       <input
+        id="user-search"
         type="text"
         placeholder="Szukaj użytkowników..."
         [formControl]="searchControl"
@@ -20,26 +27,34 @@
       >
     </div>
 
-    <div class="filter-buttons">
+    <div class="filter-group">
+      <span class="filter-label">Aktywność</span>
+      <div class="filter-buttons">
       <button
         *ngFor="let filter of statusFilters"
         (click)="filterByStatus(filter.value)"
         [class.active]="selectedStatusFilter === filter.value"
+        [attr.aria-pressed]="selectedStatusFilter === filter.value"
         class="filter-btn"
       >
         {{ filter.label }}
       </button>
+      </div>
     </div>
 
-    <div class="filter-buttons">
+    <div class="filter-group">
+      <span class="filter-label">Rola</span>
+      <div class="filter-buttons">
       <button
         *ngFor="let filter of roleFilters"
         (click)="filterByRole(filter.value)"
         [class.active]="selectedRoleFilter === filter.value"
+        [attr.aria-pressed]="selectedRoleFilter === filter.value"
         class="filter-btn"
       >
         {{ filter.label }}
       </button>
+      </div>
     </div>
   </div>
 
@@ -81,18 +96,18 @@
         </div>
 
         <div class="user-actions" *ngIf="canManage">
-          <button
+          <a
             [routerLink]="['/users', user.id]"
             class="btn btn-sm btn-outline"
           >
             Szczegóły
-          </button>
-          <button
+          </a>
+          <a
             [routerLink]="['/users/edit', user.id]"
             class="btn btn-sm btn-outline"
           >
             Edytuj
-          </button>
+          </a>
           <button
             *ngIf="user.isActive && !isCurrentUser(user.id)"
             (click)="deactivateUser(user)"
@@ -152,7 +167,20 @@
   </div>
 
 
-  <div *ngIf="errorMessage" class="error-banner">
+  <div *ngIf="errorMessage" class="error-banner" role="alert">
     {{ errorMessage }}
   </div>
+
+  <app-confirm-dialog
+    [isOpen]="!!userPendingDeactivation"
+    title="Dezaktywuj użytkownika"
+    [message]="'Czy na pewno chcesz dezaktywować użytkownika &quot;' + (userPendingDeactivation?.fullName || '') + '&quot;?'"
+    details="Użytkownik nie będzie mógł się logować do systemu."
+    type="warning"
+    confirmText="Dezaktywuj"
+    processingText="Dezaktywacja..."
+    [isProcessing]="!!deactivatingUser"
+    (confirm)="confirmDeactivateUser()"
+    (cancel)="cancelDeactivateUser()"
+  ></app-confirm-dialog>
 </div>

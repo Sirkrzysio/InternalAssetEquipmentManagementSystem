@@ -7,6 +7,7 @@ import { of } from 'rxjs';
 import { UserService } from '../../../core/services/user.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { User } from '../../../core/models';
+import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 
 @Component({
@@ -15,10 +16,15 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
   imports: [
     CommonModule,
     RouterModule,
+    ConfirmDialogComponent,
     LoadingSpinnerComponent
   ],
   templateUrl: './user-detail.component.html',
-  styleUrls: ['../users-shared.styles.css', './user-detail.component.css']
+  styleUrls: [
+    '../users-shared.styles.css',
+    './user-detail.component.css',
+    '../../../shared/styles/enterprise-detail.css'
+  ]
 })
 export class UserDetailComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
@@ -30,6 +36,7 @@ export class UserDetailComponent implements OnInit {
   isLoading = true;
   isDeactivating = false;
   isActivating = false;
+  showDeactivateConfirm = false;
   errorMessage = '';
 
   get canManage(): boolean {
@@ -81,14 +88,13 @@ export class UserDetailComponent implements OnInit {
 
   deactivateUser(): void {
     if (!this.canManage || !this.user || this.isCurrentUser) return;
+    this.showDeactivateConfirm = true;
+  }
 
-    const confirmed = confirm(
-      `Czy na pewno chcesz dezaktywować użytkownika "${this.user.fullName}"?\n\n` +
-      `Użytkownik nie będzie mógł się logować do systemu.`
-    );
+  confirmDeactivateUser(): void {
+    if (!this.user) return;
 
-    if (!confirmed) return;
-
+    this.showDeactivateConfirm = false;
     this.isDeactivating = true;
 
     this.userService.deactivate(this.user.id).pipe(
@@ -116,6 +122,10 @@ export class UserDetailComponent implements OnInit {
         this.isDeactivating = false;
       }
     });
+  }
+
+  cancelDeactivateUser(): void {
+    this.showDeactivateConfirm = false;
   }
 
   activateUser(): void {

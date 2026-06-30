@@ -6,7 +6,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { of } from 'rxjs';
 
 import { UserService } from '../../../core/services/user.service';
-import { User, UserRole } from '../../../core/models';
+import { CreateUserRequest, UpdateUserRequest, User, UserRole } from '../../../core/models';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 
 @Component({
@@ -19,7 +19,11 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
     LoadingSpinnerComponent
   ],
   templateUrl: './user-form.component.html',
-  styleUrls: ['../users-shared.styles.css', './user-form.component.css']
+  styleUrls: [
+    '../users-shared.styles.css',
+    './user-form.component.css',
+    '../../../shared/styles/enterprise-form.css'
+  ]
 })
 export class UserFormComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
@@ -149,33 +153,49 @@ export class UserFormComponent implements OnInit {
     this.errorMessage = '';
 
     const formValue = this.userForm.value;
-    const userData: any = {
+    const role = Number(formValue.role!) as UserRole;
+
+    if (this.isEditMode) {
+      const userData: UpdateUserRequest = {
+        firstName: formValue.firstName!,
+        lastName: formValue.lastName!,
+        email: formValue.email!,
+        phoneNumber: formValue.phoneNumber || undefined,
+        department: formValue.department || undefined,
+        role
+      };
+
+      this.userService.update(this.userId, userData).subscribe({
+        next: () => {
+          this.router.navigate(['/users']);
+        },
+        error: (error) => {
+          console.error('Error saving user:', error);
+          this.errorMessage = 'Nie udało się zaktualizować użytkownika';
+          this.isSubmitting = false;
+        }
+      });
+
+      return;
+    }
+
+    const userData: CreateUserRequest = {
       firstName: formValue.firstName!,
       lastName: formValue.lastName!,
       email: formValue.email!,
+      password: formValue.password!,
       phoneNumber: formValue.phoneNumber || undefined,
       department: formValue.department || undefined,
-      role: Number(formValue.role!)
+      role
     };
 
-    // Include password only for create mode
-    if (!this.isEditMode && formValue.password) {
-      userData.password = formValue.password;
-    }
-
-    const operation = this.isEditMode
-      ? this.userService.update(this.userId, userData)
-      : this.userService.create(userData);
-
-    operation.subscribe({
+    this.userService.create(userData).subscribe({
       next: () => {
         this.router.navigate(['/users']);
       },
       error: (error) => {
         console.error('Error saving user:', error);
-        this.errorMessage = this.isEditMode
-          ? 'Nie udało się zaktualizować użytkownika'
-          : 'Nie udało się dodać użytkownika';
+        this.errorMessage = 'Nie udało się dodać użytkownika';
         this.isSubmitting = false;
       }
     });

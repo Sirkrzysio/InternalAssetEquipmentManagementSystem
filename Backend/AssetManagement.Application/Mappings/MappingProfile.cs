@@ -32,9 +32,12 @@ public class MappingProfile : Profile
         CreateMap<User, UserDto>()
             .ForMember(d => d.FullName, o => o.MapFrom(s => s.FullName));
         CreateMap<CreateUserDto, User>()
-            .ForMember(d => d.PasswordHash, o => o.Ignore());
+            .ForMember(d => d.PasswordHash, o => o.Ignore())
+            .ForMember(d => d.Username, o => o.MapFrom(s => s.Email));
         CreateMap<UpdateUserDto, User>()
-            .ForMember(d => d.PasswordHash, o => o.Ignore());
+            .ForMember(d => d.PasswordHash, o => o.Ignore())
+            .ForMember(d => d.Username, o => o.MapFrom(s => s.Email))
+            .ForMember(d => d.IsActive, o => o.Ignore());
 
         // Location mappings
         CreateMap<Location, LocationDto>()

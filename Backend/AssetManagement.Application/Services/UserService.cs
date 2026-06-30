@@ -36,9 +36,9 @@ public class UserService : IUserService
         return Result<IEnumerable<UserDto>>.Success(_mapper.Map<IEnumerable<UserDto>>(users));
     }
 
-    public async Task<Result<PagedResult<UserDto>>> GetPagedAsync(int page, int pageSize, string? searchTerm = null)
+    public async Task<Result<PagedResult<UserDto>>> GetPagedAsync(int page, int pageSize, string? searchTerm = null, bool? isActive = null, AssetManagement.Domain.Enums.UserRole? role = null)
     {
-        var (items, totalCount) = await _unitOfWork.Users.GetPagedAsync(page, pageSize, searchTerm);
+        var (items, totalCount) = await _unitOfWork.Users.GetPagedAsync(page, pageSize, searchTerm, isActive, role);
         var dtos = _mapper.Map<IEnumerable<UserDto>>(items);
         return Result<PagedResult<UserDto>>.Success(PagedResult<UserDto>.Create(dtos, totalCount, page, pageSize));
     }

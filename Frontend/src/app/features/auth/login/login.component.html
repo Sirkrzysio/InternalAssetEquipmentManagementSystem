@@ -1,22 +1,43 @@
-﻿<div class="login-container">
-  <div class="login-card">
+﻿<main class="login-container">
+  <section class="login-brand" aria-labelledby="brand-title">
+    <div class="brand-lockup">
+      <span class="brand-symbol" aria-hidden="true">AM</span>
+      <span>Asset Manager</span>
+    </div>
+
+    <div class="brand-message">
+      <p class="brand-eyebrow">Wewnętrzny system ewidencji</p>
+      <h1 id="brand-title">Sprzęt pod kontrolą.<br>Bez zbędnego chaosu.</h1>
+      <p>Jedno miejsce do obsługi aktywów, przypisań, lokalizacji i odpowiedzialności.</p>
+    </div>
+
+    <div class="brand-footer">
+      <span class="status-pulse" aria-hidden="true"></span>
+      Bezpieczny dostęp pracowniczy
+    </div>
+  </section>
+
+  <section class="login-panel" aria-labelledby="login-title">
+    <div class="login-card">
     <div class="login-header">
-      <h1>Zarządzanie Majątkiem</h1>
-      <p>Zaloguj się do systemu</p>
+      <p class="login-eyebrow">Witaj ponownie</p>
+      <h2 id="login-title">Zaloguj się</h2>
+      <p>Użyj firmowego adresu e-mail, aby przejść do systemu.</p>
     </div>
 
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
       <div class="form-group">
-        <label for="email">Email</label>
+        <label for="email">Adres e-mail</label>
         <input
           type="email"
           id="email"
           formControlName="email"
           [class.error]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
-          placeholder="Wprowadź email"
+          placeholder="imie.nazwisko@firma.pl"
+          autocomplete="email"
         >
         <div *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" class="error-message">
-          Email jest wymagany
+          Podaj prawidłowy adres e-mail
         </div>
       </div>
 
@@ -28,13 +49,14 @@
           formControlName="password"
           [class.error]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
           placeholder="Wprowadź hasło"
+          autocomplete="current-password"
         >
         <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" class="error-message">
           Hasło jest wymagane
         </div>
       </div>
 
-      <div *ngIf="errorMessage" class="alert-error">
+      <div *ngIf="errorMessage" class="alert-error" role="alert">
         {{ errorMessage }}
       </div>
 
@@ -48,4 +70,5 @@
       </button>
     </form>
   </div>
-</div>
+  </section>
+</main>

@@ -52,9 +52,19 @@ public class UserRepository : IUserRepository
             .ToListAsync();
     }
 
-    public async Task<(IEnumerable<User> Items, int TotalCount)> GetPagedAsync(int page, int pageSize, string? searchTerm = null)
+    public async Task<(IEnumerable<User> Items, int TotalCount)> GetPagedAsync(int page, int pageSize, string? searchTerm = null, bool? isActive = null, UserRole? role = null)
     {
         var query = _context.Users.AsQueryable();
+
+        if (isActive.HasValue)
+        {
+            query = query.Where(u => u.IsActive == isActive.Value);
+        }
+
+        if (role.HasValue)
+        {
+            query = query.Where(u => u.Role == role.Value);
+        }
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {

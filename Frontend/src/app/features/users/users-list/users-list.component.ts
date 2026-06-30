@@ -7,6 +7,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { UserService } from '../../../core/services/user.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { User, PagedResult, UserRole } from '../../../core/models';
+import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 
 @Component({
@@ -16,6 +17,7 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
     CommonModule,
     ReactiveFormsModule,
     RouterModule,
+    ConfirmDialogComponent,
     LoadingSpinnerComponent
   ],
   templateUrl: './users-list.component.html',
@@ -43,6 +45,7 @@ export class UsersListComponent implements OnInit {
   errorMessage = '';
   deactivatingUser = '';
   activatingUser = '';
+  userPendingDeactivation: User | null = null;
 
   searchControl = new FormControl('');
 
@@ -90,13 +93,15 @@ export class UsersListComponent implements OnInit {
     const request = {
       page: this.pagedResult.page,
       pageSize: this.pagedResult.pageSize,
-      searchTerm: this.searchControl.value || undefined
+      searchTerm: this.searchControl.value || undefined,
+      isActive: this.selectedStatusFilter === 'all' ? undefined : this.selectedStatusFilter === 'active',
+      role: this.selectedRoleFilter === 'all' ? undefined : this.selectedRoleFilter
     };
 
     this.userService.getPaged(request).subscribe({
       next: (result) => {
         this.pagedResult = result;
-        this.users = this.applyFilters(result.items);
+        this.users = result.items;
         this.isLoading = false;
         this.cdr.detectChanges();
       },
@@ -119,34 +124,16 @@ export class UsersListComponent implements OnInit {
     });
   }
 
-  private applyFilters(users: User[]): User[] {
-    let filtered = [...users];
-
-    // Filter by status
-    if (this.selectedStatusFilter !== 'all') {
-      filtered = filtered.filter(user => {
-        if (this.selectedStatusFilter === 'active') return user.isActive;
-        if (this.selectedStatusFilter === 'inactive') return !user.isActive;
-        return true;
-      });
-    }
-
-    // Filter by role
-    if (this.selectedRoleFilter !== 'all') {
-      filtered = filtered.filter(user => user.role === this.selectedRoleFilter);
-    }
-
-    return filtered;
-  }
-
   filterByStatus(status: 'all' | 'active' | 'inactive'): void {
     this.selectedStatusFilter = status;
-    this.users = this.applyFilters(this.pagedResult.items);
+    this.pagedResult.page = 1;
+    this.loadUsers();
   }
 
   filterByRole(role: UserRole | 'all'): void {
     this.selectedRoleFilter = role;
-    this.users = this.applyFilters(this.pagedResult.items);
+    this.pagedResult.page = 1;
+    this.loadUsers();
   }
 
   changePage(page: number): void {
@@ -162,15 +149,15 @@ export class UsersListComponent implements OnInit {
 
   deactivateUser(user: User): void {
     if (!this.canManage || this.isCurrentUser(user.id)) return;
+    this.userPendingDeactivation = user;
+  }
 
-    const confirmed = confirm(
-      `Czy na pewno chcesz dezaktywować użytkownika "${user.fullName}"?\n\n` +
-      `Użytkownik nie będzie mógł się logować do systemu.`
-    );
+  confirmDeactivateUser(): void {
+    if (!this.userPendingDeactivation) return;
 
-    if (!confirmed) return;
-
+    const user = this.userPendingDeactivation;
     this.deactivatingUser = user.id;
+    this.userPendingDeactivation = null;
 
     this.userService.deactivate(user.id).subscribe({
       next: () => {
@@ -183,6 +170,10 @@ export class UsersListComponent implements OnInit {
         this.deactivatingUser = '';
       }
     });
+  }
+
+  cancelDeactivateUser(): void {
+    this.userPendingDeactivation = null;
   }
 
   activateUser(user: User): void {

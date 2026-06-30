@@ -131,4 +131,17 @@
   <div *ngIf="errorMessage" class="error-banner">
     {{ errorMessage }}
   </div>
+
+  <app-confirm-dialog
+    [isOpen]="showDeactivateConfirm"
+    title="Dezaktywuj użytkownika"
+    [message]="'Czy na pewno chcesz dezaktywować użytkownika &quot;' + (user?.fullName || '') + '&quot;?'"
+    details="Użytkownik nie będzie mógł się logować do systemu."
+    type="warning"
+    confirmText="Dezaktywuj"
+    processingText="Dezaktywacja..."
+    [isProcessing]="isDeactivating"
+    (confirm)="confirmDeactivateUser()"
+    (cancel)="cancelDeactivateUser()"
+  ></app-confirm-dialog>
 </div>
